@@ -57,7 +57,9 @@ local savedAmounts = {}
 local savedWaits = {} 
 local isSyncing = false 
 local isSyncingWait = false 
-local toggleFeaturesUI = {} -- ตารางสำหรับเก็บ UI ที่เป็นของฟีเจอร์ Toggle (เพื่อเอาไว้ซ่อน/แสดง)
+
+-- ตารางสำหรับเก็บ UI ที่เป็นของฟีเจอร์ Toggle (เพื่อเอาไว้ซ่อน/แสดง)
+local toggleFeaturesUI = {} 
 
 -- ======================================================================
 -- [ CORE FUNCTIONS ]
@@ -84,7 +86,7 @@ local function MakeDraggable(guiObject)
     end)
 end
 
--- 1. สร้างปุ่ม Float พื้นฐานสำหรับ Remote ทั่วไป
+-- 1. สร้างปุ่ม Float พื้นฐาน
 local function createOnScreenButton(remote, remoteDisplayName)
     local guiName = "CustomRemoteButtonsGui"
     local gui = CoreGui:FindFirstChild(guiName) or Instance.new("ScreenGui", CoreGui)
@@ -111,7 +113,7 @@ local function createOnScreenButton(remote, remoteDisplayName)
     end)
 end
 
--- 2. สร้างปุ่ม Float แบบ Toggle (วนลูป) สำหรับ Remote ทั่วไป
+-- 2. สร้างปุ่ม Float แบบ Toggle (วนลูป)
 local function createOnScreenToggle(remote, remoteDisplayName)
     local guiName = "CustomFloatTogglesGui"
     local gui = CoreGui:FindFirstChild(guiName) or Instance.new("ScreenGui", CoreGui)
@@ -135,9 +137,9 @@ local function createOnScreenToggle(remote, remoteDisplayName)
     local isToggled = false
     btn.MouseButton1Click:Connect(function()
         isToggled = not isToggled
-        btn.Text = isToggled and ("  " .. remote.Name .. " [ON]  ") or ("  " .. remote.Name .. " [OFF]  ")
         
-        -- สลับสีตามที่กำหนด
+        -- ตอน OFF สีดำอักษรขาว, ตอน ON สีขาวอักษรดำ ตามสั่ง
+        btn.Text = isToggled and ("  " .. remote.Name .. " [ON]  ") or ("  " .. remote.Name .. " [OFF]  ")
         btn.BackgroundColor3 = isToggled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(0, 0, 0)
         btn.TextColor3 = isToggled and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(255, 255, 255)
 
@@ -212,9 +214,9 @@ local function createCustomFloatToggle(buttonText, argsTable, waitInputId, amoun
     local isToggled = false
     btn.MouseButton1Click:Connect(function()
         isToggled = not isToggled
-        btn.Text = isToggled and ("  " .. buttonText .. " [ON]  ") or ("  " .. buttonText .. " [OFF]  ")
         
-        -- สลับสีตามที่กำหนด
+        -- ตอน OFF สีดำอักษรขาว, ตอน ON สีขาวอักษรดำ ตามสั่ง
+        btn.Text = isToggled and ("  " .. buttonText .. " [ON]  ") or ("  " .. buttonText .. " [OFF]  ")
         btn.BackgroundColor3 = isToggled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(0, 0, 0)
         btn.TextColor3 = isToggled and Color3.fromRGB(0, 0, 0) or Color3.fromRGB(255, 255, 255)
 
@@ -300,24 +302,14 @@ TopRemoteGroupbox:AddInput("TopRunAmount", {
             if remote then
                 local uniqueId = "RemoteInput_" .. remote:GetDebugId()
                 if Options[uniqueId] and Options[uniqueId].Value ~= Value then
-                    isSyncing = true
-                    Options[uniqueId]:SetValue(Value)
-                    isSyncing = false
+                    isSyncing = true; Options[uniqueId]:SetValue(Value); isSyncing = false
                 end
             end
         end
     end
 })
 
-TopRemoteGroupbox:AddButton({ Text = "▶ Run Selected", Func = function()
-    local selectedName = Options.SelectedRemote.Value
-    local remote = remoteMap[selectedName]
-    if remote then
-        local amount = tonumber(savedAmounts[selectedName]) or 1
-        for i = 1, amount do remote:FireServer() end
-    end
-end })
-
+-- บันทึกเก็บไว้ซ่อน
 local _topWaitInput = TopRemoteGroupbox:AddInput("TopWaitAmount", {
     Default = "1", Numeric = true, Finished = false, Text = "Task.wait() Time", Placeholder = "Enter wait time...",
     Callback = function(Value)
@@ -329,27 +321,37 @@ local _topWaitInput = TopRemoteGroupbox:AddInput("TopWaitAmount", {
             if remote then
                 local waitUniqueId = "RemoteWait_" .. remote:GetDebugId()
                 if Options[waitUniqueId] and Options[waitUniqueId].Value ~= Value then
-                    isSyncingWait = true
-                    Options[waitUniqueId]:SetValue(Value)
-                    isSyncingWait = false
+                    isSyncingWait = true; Options[waitUniqueId]:SetValue(Value); isSyncingWait = false
                 end
             end
         end
     end
 })
 table.insert(toggleFeaturesUI, _topWaitInput)
+
+TopRemoteGroupbox:AddButton({ Text = "▶ Run Selected", Func = function()
+    local selectedName = Options.SelectedRemote.Value
+    local remote = remoteMap[selectedName]
+    if remote then
+        local amount = tonumber(savedAmounts[selectedName]) or 1
+        for i = 1, amount do remote:FireServer() end
+    end
+end })
+
 TopRemoteGroupbox:AddButton({ Text = "🪟 Add Float Button", Func = function()
     local selectedName = Options.SelectedRemote.Value
     local remote = remoteMap[selectedName]
     if remote then createOnScreenButton(remote, selectedName) end
 end })
 
+-- บันทึกเก็บไว้ซ่อน
 local _topTglBtn = TopRemoteGroupbox:AddButton({ Text = "🔁 Add Float Toggle Button", Func = function()
     local selectedName = Options.SelectedRemote.Value
     local remote = remoteMap[selectedName]
     if remote then createOnScreenToggle(remote, selectedName) end
 end })
 table.insert(toggleFeaturesUI, _topTglBtn)
+
 
 local RemoteGroupbox = Tabs.Remote:AddLeftGroupbox("All Remotes (List)")
 for _, instance in ipairs(ReplicatedStorage:GetDescendants()) do
@@ -372,6 +374,7 @@ for _, instance in ipairs(ReplicatedStorage:GetDescendants()) do
             end
         })
         
+        -- บันทึกเก็บไว้ซ่อน
         local _listWaitInput = RemoteGroupbox:AddInput(waitUniqueId, { 
             Default = "1", Numeric = true, Finished = false, Text = "Task.wait() Time", Placeholder = "Enter wait time...",
             Callback = function(Value)
@@ -390,8 +393,10 @@ for _, instance in ipairs(ReplicatedStorage:GetDescendants()) do
             local amount = tonumber(savedAmounts[displayName]) or 1
             for i = 1, amount do instance:FireServer() end
         end })
+        
         RemoteGroupbox:AddButton({ Text = "Add Float Button", Func = function() createOnScreenButton(instance, displayName) end })
         
+        -- บันทึกเก็บไว้ซ่อน
         local _listTglBtn = RemoteGroupbox:AddButton({ Text = "Add Float Toggle Button", Func = function() createOnScreenToggle(instance, displayName) end })
         table.insert(toggleFeaturesUI, _listTglBtn)
         
@@ -460,9 +465,11 @@ MiscGroupbox:AddButton({ Text = "Red Button", Func = function()
 end })
 MiscGroupbox:AddButton({ Text = "Float Button Red", Func = function() createCustomSkillButton("Red", {"Reversal Red"}, "AmountFireRed") end })
 
+-- บันทึกเก็บไว้ซ่อน
 local _redWaitInput = MiscGroupbox:AddInput("WaitAmountRed", { Default = "1", Numeric = true, Finished = false, Text = "Task.wait() Time", Placeholder = "Enter wait time..." })
 table.insert(toggleFeaturesUI, _redWaitInput)
 
+-- บันทึกเก็บไว้ซ่อน
 local _redTglBtn = MiscGroupbox:AddButton({ Text = "Float Toggle Button Red", Func = function() createCustomFloatToggle("Red", {"Reversal Red"}, "WaitAmountRed", "AmountFireRed") end })
 table.insert(toggleFeaturesUI, _redTglBtn)
 
@@ -476,9 +483,11 @@ MiscGroupbox:AddButton({ Text = "Red2 Button", Func = function()
 end })
 MiscGroupbox:AddButton({ Text = "Float Button Red2", Func = function() createCustomSkillButton("Red2", {"First Reversal Red"}, "AmountFireRed2") end })
 
+-- บันทึกเก็บไว้ซ่อน
 local _red2WaitInput = MiscGroupbox:AddInput("WaitAmountRed2", { Default = "1", Numeric = true, Finished = false, Text = "Task.wait() Time", Placeholder = "Enter wait time..." })
 table.insert(toggleFeaturesUI, _red2WaitInput)
 
+-- บันทึกเก็บไว้ซ่อน
 local _red2TglBtn = MiscGroupbox:AddButton({ Text = "Float Toggle Button Red2", Func = function() createCustomFloatToggle("Red2", {"First Reversal Red"}, "WaitAmountRed2", "AmountFireRed2") end })
 table.insert(toggleFeaturesUI, _red2TglBtn)
 
@@ -539,24 +548,38 @@ RunService.RenderStepped:Connect(function()
 end)
 
 -- ======================================================================
--- [ SETTING & VISIBILITY SYSTEM ]
+-- [ SETTING & VISIBILITY SYSTEM (FIXED) ]
 -- ======================================================================
+local function SetUIElementVisibility(element, isVisible)
+    pcall(function()
+        -- เจาะเข้าถึง Frame ด้านในของ LinoriaLib เพื่อซ่อนให้ชัวร์ที่สุด
+        if type(element) == "table" then
+            if element.Container then element.Container.Visible = isVisible end
+            if element.Main then element.Main.Visible = isVisible end
+            if element.Frame then element.Frame.Visible = isVisible end
+            if element.Base then element.Base.Visible = isVisible end
+            
+            -- บังคับเซตค่า Visible ลงใน Table ด้วย (ถ้า Library รองรับ Setter)
+            element.Visible = isVisible 
+            if type(element.SetVisible) == "function" then element:SetVisible(isVisible) end
+        elseif typeof(element) == "Instance" then
+            element.Visible = isVisible
+        end
+    end)
+end
+
 local MenuGroup = Tabs.Setting:AddLeftGroupbox("Menu Settings")
 
 MenuGroup:AddToggle("ShowFloatToggleFeature", {
     Text = "Show Float Toggle Features",
     Default = false,
     Callback = function(Value)
-        -- วนลูปเพื่อ ซ่อน/แสดง UI (ช่อง Task.wait และ ปุ่มเสก Float Toggle) ในหน้าต่าง
+        -- วนลูปซ่อน/แสดง
         for _, elem in ipairs(toggleFeaturesUI) do
-            pcall(function()
-                if elem.Visible ~= nil then
-                    elem.Visible = Value
-                end
-            end)
+            SetUIElementVisibility(elem, Value)
         end
         
-        -- ถ้าปิดฟีเจอร์นี้ ให้ซ่อนปุ่ม Float Toggle ที่ลอยอยู่บนหน้าจอไปด้วย (ถ้ามี)
+        -- ซ่อนปุ่ม Toggle ที่เสกมาลอยหน้าจอด้วย (ถ้ามี)
         local gui = CoreGui:FindFirstChild("CustomFloatTogglesGui")
         if gui then gui.Enabled = Value end
     end
@@ -575,9 +598,9 @@ end)
 MenuGroup:AddLabel("Menu bind"):AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
 Library.ToggleKeybind = Options.MenuKeybind
 
--- บังคับซ่อน UI ของฟีเจอร์ Toggle ตอนเริ่มรันสคริปต์ (ตามค่า Default = false)
+-- บังคับซ่อนตอนเริ่มต้นสคริปต์ (เพราะ Default ของ Toggle คือ false)
 for _, elem in ipairs(toggleFeaturesUI) do
-    pcall(function() elem.Visible = false end)
+    SetUIElementVisibility(elem, false)
 end
 
 ThemeManager:SetLibrary(Library); SaveManager:SetLibrary(Library)
