@@ -309,6 +309,22 @@ TopRemoteGroupbox:AddInput("TopRunAmount", {
     end
 })
 
+
+TopRemoteGroupbox:AddButton({ Text = "▶ Run Selected", Func = function()
+    local selectedName = Options.SelectedRemote.Value
+    local remote = remoteMap[selectedName]
+    if remote then
+        local amount = tonumber(savedAmounts[selectedName]) or 1
+        for i = 1, amount do remote:FireServer() end
+    end
+end })
+
+TopRemoteGroupbox:AddButton({ Text = "🪟 Add Float Button", Func = function()
+    local selectedName = Options.SelectedRemote.Value
+    local remote = remoteMap[selectedName]
+    if remote then createOnScreenButton(remote, selectedName) end
+end })
+
 -- บันทึกเก็บไว้ซ่อน
 local _topWaitInput = TopRemoteGroupbox:AddInput("TopWaitAmount", {
     Default = "1", Numeric = true, Finished = false, Text = "Task.wait() Time", Placeholder = "Enter wait time...",
@@ -328,21 +344,6 @@ local _topWaitInput = TopRemoteGroupbox:AddInput("TopWaitAmount", {
     end
 })
 table.insert(toggleFeaturesUI, _topWaitInput)
-
-TopRemoteGroupbox:AddButton({ Text = "▶ Run Selected", Func = function()
-    local selectedName = Options.SelectedRemote.Value
-    local remote = remoteMap[selectedName]
-    if remote then
-        local amount = tonumber(savedAmounts[selectedName]) or 1
-        for i = 1, amount do remote:FireServer() end
-    end
-end })
-
-TopRemoteGroupbox:AddButton({ Text = "🪟 Add Float Button", Func = function()
-    local selectedName = Options.SelectedRemote.Value
-    local remote = remoteMap[selectedName]
-    if remote then createOnScreenButton(remote, selectedName) end
-end })
 
 -- บันทึกเก็บไว้ซ่อน
 local _topTglBtn = TopRemoteGroupbox:AddButton({ Text = "🔁 Add Float Toggle Button", Func = function()
