@@ -552,7 +552,7 @@ end)
 -- [ GOJO MOVESET - STYLED EDITION ]
 -- ======================================================================
 
-local GojoMoves = GojoTab:AddLeftGroupbox("Gojo Moveset")
+local GojoMoves = Tabs.Moveset:AddLeftGroupbox("Gojo Moveset")
 
 -- 2. ฟังก์ชันช่วยสร้าง UI ตามสไตล์ในรูปภาพ
 local function AddStyledMove(displayName, remotePath, amountKey)
