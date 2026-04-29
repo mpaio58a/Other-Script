@@ -41,9 +41,67 @@ task.spawn(function()
     end
 end)
 
-local MainTab = Window:AddTab("Main", "home")      -- แท็บที่ 1
-local MTab = Window:AddTab("Moveset", "swords")    -- แท็บที่ 2 (ตรงกลาง)
-local SettingsTab = Window:AddTab("Settings", "settings") -- แท็บที่ 3
+-- 1. จัดลำดับแท็บ (วางไว้ตรงส่วนที่สร้าง Tabs)
+local Tabs = {
+    Remote = Window:AddTab("Remote", "zap"),
+    Moveset = Window:AddTab("Moveset", "swords"), -- อยู่ตรงกลาง
+    Setting = Window:AddTab("Setting", "settings"),
+}
+
+-- 2. ตัวแปรอ้างอิง Service
+local RS = game:GetService("ReplicatedStorage")
+local GBox = Tabs.Moveset:AddLeftGroupbox("Gojo Moveset")
+
+-- 3. ฟังก์ชันสร้าง UI สไตล์ Custom (เหมือนในรูปเป๊ะ)
+local function CreateMoveUI(name, remote, optId)
+    GBox:AddLabel("🎯 " .. name)
+    
+    GBox:AddInput(optId, {
+        Default = "1", Numeric = true, Finished = false,
+        Text = "Amount to Fire", Placeholder = "1",
+    })
+
+    GBox:AddButton({
+        Text = "Execute",
+        Func = function()
+            local amt = tonumber(Options[optId] and Options[optId].Value) or 1
+            for i = 1, amt do pcall(function() remote:FireServer() end) end
+        end
+    })
+
+    GBox:AddButton({
+        Text = "Add Float Button",
+        Func = function()
+            local amt = Options[optId] and Options[optId].Value or "1"
+            savedAmounts[name] = amt -- ใช้ตารางจากสคริปต์หลัก
+            pcall(function() createOnScreenButton(remote, name) end)
+        end
+    })
+    GBox:AddDivider()
+end
+
+-- 4. รันคำสั่งสร้างปุ่มทั้งหมด (เรียงลำดับ)
+local function SetupGojoMoves()
+    -- Remote Groups
+    local R = RS:WaitForChild("Remotes")
+    local C = RS:WaitForChild("Characters")
+    local E = RS:WaitForChild("Events")
+
+    CreateMoveUI("Reversed Cursed Technique", R:WaitForChild("ReversedCursedTechnique"), "m_rct")
+    CreateMoveUI("Honored One", C:WaitForChild("HonoredOne"), "m_hon")
+    CreateMoveUI("Blue", R:WaitForChild("Blue"), "m_b1")
+    CreateMoveUI("Blue 2", R:WaitForChild("Blue2"), "m_b2")
+    CreateMoveUI("Hora Hora", R:WaitForChild("HoraHora"), "m_hora")
+    CreateMoveUI("Beatdown", R:WaitForChild("Beatdown"), "m_beat")
+    CreateMoveUI("Black Flash", R:WaitForChild("BlackFlash"), "m_black")
+    CreateMoveUI("Heal", R:WaitForChild("Heal"), "m_heal")
+    CreateMoveUI("Unlimited Void", E:WaitForChild("UnlimitedVoid"), "m_void")
+    CreateMoveUI("Purple", R:WaitForChild("Purple"), "m_p1")
+    CreateMoveUI("Imaginary Purple", R:WaitForChild("ImaginaryPurple"), "m_p2")
+end
+
+-- รันฟังก์ชัน
+SetupGojoMoves()
 
 -- ESP Container
 local espFolder = Instance.new("Folder")
@@ -545,67 +603,6 @@ RunService.RenderStepped:Connect(function()
         end
     end
 end)
-
--- ======================================================================
--- [ GOJO MOVESET - FIXED & STYLED ]
--- ======================================================================
-
--- 1. สร้าง Tab ใหม่ (ตรวจสอบว่า Window มีอยู่จริง)
-local GBox = MTab:AddLeftGroupbox("Gojo Moveset")
-
--- 2. ฟังก์ชันสร้างปุ่มสไตล์ตามรูปที่คุณส่งมา
-local function AddGojoMove(name, remotePath, optId)
-    -- ไอคอน + ชื่อ (Label)
-    GBox:AddLabel("🎯 " .. name)
-
-    -- ช่องใส่จำนวน (Input)
-    GBox:AddInput(optId, {
-        Default = "1",
-        Numeric = true,
-        Finished = false,
-        Text = "Amount to Fire",
-        Placeholder = "1",
-    })
-
-    -- ปุ่มรัน (Execute)
-    GBox:AddButton({
-        Text = "Execute",
-        Func = function()
-            local amt = tonumber(Options[optId] and Options[optId].Value) or 1
-            for i = 1, amt do 
-                pcall(function() remotePath:FireServer() end) 
-            end
-        end
-    })
-
-    -- ปุ่มลอย (Add Float Button)
-    GBox:AddButton({
-        Text = "Add Float Button",
-        Func = function()
-            local amt = Options[optId] and Options[optId].Value or "1"
-            savedAmounts[name] = amt
-            pcall(function() createOnScreenButton(remotePath, name) end)
-        end
-    })
-
-    GBox:AddDivider()
-end
-
--- 3. รายการสกิล (ดึงจาก ReplicatedStorage)
-local RS = game:GetService("ReplicatedStorage")
-local Rem = RS:WaitForChild("Remotes")
-
-AddGojoMove("RCT", Rem:WaitForChild("ReversedCursedTechnique"), "m_rct")
-AddGojoMove("Honored One", RS:WaitForChild("Characters"):WaitForChild("HonoredOne"), "m_hon")
-AddGojoMove("Blue", Rem:WaitForChild("Blue"), "m_b1")
-AddGojoMove("Blue 2", Rem:WaitForChild("Blue2"), "m_b2")
-AddGojoMove("Hora Hora", Rem:WaitForChild("HoraHora"), "m_hora")
-AddGojoMove("Beatdown", Rem:WaitForChild("Beatdown"), "m_beat")
-AddGojoMove("Black Flash", Rem:WaitForChild("BlackFlash"), "m_black")
-AddGojoMove("Heal", Rem:WaitForChild("Heal"), "m_heal")
-AddGojoMove("Unlimited Void", RS:WaitForChild("Events"):WaitForChild("UnlimitedVoid"), "m_void")
-AddGojoMove("Purple", Rem:WaitForChild("Purple"), "m_p1")
-AddGojoMove("Imaginary Purple", Rem:WaitForChild("ImaginaryPurple"), "m_p2")
 
 -- ======================================================================
 -- [ SETTING & VISIBILITY SYSTEM (FIXED) ]
