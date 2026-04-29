@@ -43,8 +43,6 @@ end)
 
 local Tabs = {
     Remote = Window:AddTab("Remote", "zap"),
-    GojoTab = Window:AddTab("Moveset", "swords"),
-    Setting = Window:AddTab("Setting", "settings"),
 }
 
 -- ESP Container
@@ -549,73 +547,73 @@ RunService.RenderStepped:Connect(function()
 end)
 
 -- ======================================================================
--- [ GOJO MOVESET - STYLED EDITION ]
+-- [ GOJO MOVESET - FIXED & STYLED ]
 -- ======================================================================
 
-local GojoMoves = Tabs.Moveset:AddLeftGroupbox("Gojo Moveset")
+-- 1. สร้าง Tab ใหม่ (ตรวจสอบว่า Window มีอยู่จริง)
+local MTab = Window:AddTab("Moveset", "swords")
+local GBox = MTab:AddLeftGroupbox("Gojo Moveset")
 
--- 2. ฟังก์ชันช่วยสร้าง UI ตามสไตล์ในรูปภาพ
-local function AddStyledMove(displayName, remotePath, amountKey)
-    -- ส่วนที่ 1: Label พร้อมไอคอน (🎯)
-    GojoMoves:AddLabel("🎯 " .. displayName)
+-- 2. ฟังก์ชันสร้างปุ่มสไตล์ตามรูปที่คุณส่งมา
+local function AddGojoMove(name, remotePath, optId)
+    -- ไอคอน + ชื่อ (Label)
+    GBox:AddLabel("🎯 " .. name)
 
-    -- ส่วนที่ 2: ช่อง Input สำหรับจำนวนที่จะ Fire (Amount to Fire)
-    GojoMoves:AddInput(amountKey, {
+    -- ช่องใส่จำนวน (Input)
+    GBox:AddInput(optId, {
         Default = "1",
         Numeric = true,
         Finished = false,
         Text = "Amount to Fire",
-        Placeholder = "Enter amount...",
+        Placeholder = "1",
     })
 
-    -- ส่วนที่ 3: ปุ่ม Execute
-    GojoMoves:AddButton({
+    -- ปุ่มรัน (Execute)
+    GBox:AddButton({
         Text = "Execute",
         Func = function()
-            local amount = tonumber(Options[amountKey] and Options[amountKey].Value) or 1
-            local success, remote = pcall(function() return remotePath end)
-            if success and remote then
-                for i = 1, amount do remote:FireServer() end
+            local amt = tonumber(Options[optId] and Options[optId].Value) or 1
+            for i = 1, amt do 
+                pcall(function() remotePath:FireServer() end) 
             end
         end
     })
 
-    -- ส่วนที่ 4: ปุ่ม Add Float Button
-    GojoMoves:AddButton({
+    -- ปุ่มลอย (Add Float Button)
+    GBox:AddButton({
         Text = "Add Float Button",
         Func = function()
-            local success, remote = pcall(function() return remotePath end)
-            if success and remote then
-                -- เรียกใช้ฟังก์ชันเดิมในเครื่อง โดยส่งค่าจำนวนจากช่อง Input ไปด้วย
-                local amountInput = Options[amountKey] and Options[amountKey].Value or "1"
-                savedAmounts[displayName] = amountInput -- บันทึกค่าเข้า Table หลักของสคริปต์คุณ
-                createOnScreenButton(remote, displayName)
-            end
+            local amt = Options[optId] and Options[optId].Value or "1"
+            savedAmounts[name] = amt
+            pcall(function() createOnScreenButton(remotePath, name) end)
         end
     })
 
-    -- ส่วนที่ 5: เส้นคั่น (Divider)
-    GojoMoves:AddDivider()
+    GBox:AddDivider()
 end
 
--- 3. รายการสกิล (รันตามลำดับ)
+-- 3. รายการสกิล (ดึงจาก ReplicatedStorage)
 local RS = game:GetService("ReplicatedStorage")
+local Rem = RS:WaitForChild("Remotes")
 
-AddStyledMove("Reversed Cursed Technique", RS:WaitForChild("Remotes"):WaitForChild("ReversedCursedTechnique"), "Amt_RCT")
-AddStyledMove("Honored One", RS:WaitForChild("Characters"):WaitForChild("HonoredOne"), "Amt_Honored")
-AddStyledMove("Blue", RS:WaitForChild("Remotes"):WaitForChild("Blue"), "Amt_Blue")
-AddStyledMove("Blue 2", RS:WaitForChild("Remotes"):WaitForChild("Blue2"), "Amt_Blue2")
-AddStyledMove("Hora Hora", RS:WaitForChild("Remotes"):WaitForChild("HoraHora"), "Amt_Hora")
-AddStyledMove("Beatdown", RS:WaitForChild("Remotes"):WaitForChild("Beatdown"), "Amt_Beatdown")
-AddStyledMove("Black Flash", RS:WaitForChild("Remotes"):WaitForChild("BlackFlash"), "Amt_Black")
-AddStyledMove("Heal", RS:WaitForChild("Remotes"):WaitForChild("Heal"), "Amt_Heal")
-AddStyledMove("Unlimited Void", RS:WaitForChild("Events"):WaitForChild("UnlimitedVoid"), "Amt_Void")
-AddStyledMove("Purple", RS:WaitForChild("Remotes"):WaitForChild("Purple"), "Amt_Purple")
-AddStyledMove("Imaginary Purple", RS:WaitForChild("Remotes"):WaitForChild("ImaginaryPurple"), "Amt_IPurple")
+AddGojoMove("RCT", Rem:WaitForChild("ReversedCursedTechnique"), "m_rct")
+AddGojoMove("Honored One", RS:WaitForChild("Characters"):WaitForChild("HonoredOne"), "m_hon")
+AddGojoMove("Blue", Rem:WaitForChild("Blue"), "m_b1")
+AddGojoMove("Blue 2", Rem:WaitForChild("Blue2"), "m_b2")
+AddGojoMove("Hora Hora", Rem:WaitForChild("HoraHora"), "m_hora")
+AddGojoMove("Beatdown", Rem:WaitForChild("Beatdown"), "m_beat")
+AddGojoMove("Black Flash", Rem:WaitForChild("BlackFlash"), "m_black")
+AddGojoMove("Heal", Rem:WaitForChild("Heal"), "m_heal")
+AddGojoMove("Unlimited Void", RS:WaitForChild("Events"):WaitForChild("UnlimitedVoid"), "m_void")
+AddGojoMove("Purple", Rem:WaitForChild("Purple"), "m_p1")
+AddGojoMove("Imaginary Purple", Rem:WaitForChild("ImaginaryPurple"), "m_p2")
 
 -- ======================================================================
 -- [ SETTING & VISIBILITY SYSTEM (FIXED) ]
 -- ======================================================================
+
+Setting = Window:AddTab("Setting", "settings"),
+
 local function SetUIElementVisibility(element, isVisible)
     pcall(function()
         -- เจาะเข้าถึง Frame ด้านในของ LinoriaLib เพื่อซ่อนให้ชัวร์ที่สุด
