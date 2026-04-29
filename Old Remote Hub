@@ -103,6 +103,59 @@ end
 -- รันฟังก์ชัน
 SetupGojoMoves()
 
+-- ======================================================================
+-- [ SUKUNA MOVESET - RIGHT GROUPBOX ]
+-- ======================================================================
+
+-- 1. สร้าง Groupbox ฝั่งขวาในแท็บ Moveset
+local SBox = Tabs.Moveset:AddRightGroupbox("Sukuna Moveset")
+
+-- 2. ฟังก์ชันสร้าง UI (ใช้ตัวแปร SBox)
+local function AddSukunaMove(name, remote, optId)
+    SBox:AddLabel("🎯 " .. name) -- เปลี่ยนไอคอนเป็นหัวกะโหลกให้เข้ากับ Sukuna
+    
+    SBox:AddInput(optId, {
+        Default = "1", Numeric = true, Finished = false,
+        Text = "Amount to Fire", Placeholder = "1",
+    })
+
+    SBox:AddButton({
+        Text = "Execute",
+        Func = function()
+            local amt = tonumber(Options[optId] and Options[optId].Value) or 1
+            for i = 1, amt do pcall(function() remote:FireServer() end) end
+        end
+    })
+
+    SBox:AddButton({
+        Text = "Add Float Button",
+        Func = function()
+            local amt = Options[optId] and Options[optId].Value or "1"
+            savedAmounts[name] = amt
+            pcall(function() createOnScreenButton(remote, name) end)
+        end
+    })
+    SBox:AddDivider()
+end
+
+-- 3. ตั้งค่า Remote Paths (อ้างอิงตามที่คุณส่งมา)
+local RS = game:GetService("ReplicatedStorage")
+local R = RS:WaitForChild("Remotes")
+
+-- สร้างรายการสกิล Sukuna
+AddSukunaMove("King of Curses", R:WaitForChild("Sukuna"):WaitForChild("KingofCurses"), "s_king")
+AddSukunaMove("The Vessel", RS:WaitForChild("Characters"):WaitForChild("TheVessel"), "s_vessel")
+AddSukunaMove("Malevolent Shrine", R:WaitForChild("Sukuna"):WaitForChild("MalevolentShrine"), "s_shrine")
+
+-- หมายเหตุ: อ้างอิงตามชื่อโฟลเดอร์ "Remtoes" ที่คุณส่งมา
+AddSukunaMove("Fire", RS:WaitForChild("Assets"):WaitForChild("Remtoes"):WaitForChild("Fire"), "s_fire")
+
+AddSukunaMove("Red Heal", R:WaitForChild("RedHeal"), "s_rheal")
+AddSukunaMove("Dismantle", R:WaitForChild("Sukuna"):WaitForChild("Dismantle"), "s_dis")
+AddSukunaMove("Cleaves", R:WaitForChild("Sukuna"):WaitForChild("Cleaves"), "s_cleave")
+AddSukunaMove("Triple Slice", R:WaitForChild("Sukuna"):WaitForChild("TripleSlice"), "s_triple")
+AddSukunaMove("Slaughter Demon", R:WaitForChild("Yuji"):WaitForChild("SlaughterDemon"), "s_demon")
+
 -- ESP Container
 local espFolder = Instance.new("Folder")
 espFolder.Name = "ESP_Container"
