@@ -43,6 +43,7 @@ end)
 
 local Tabs = {
     Remote = Window:AddTab("Remote", "zap"),
+    GojoTab = Window:AddTab("Moveset", "swords"),
     Setting = Window:AddTab("Setting", "settings"),
 }
 
@@ -551,9 +552,6 @@ end)
 -- [ ส่วนเสริม: GOJO MOVESET TAB ]
 -- วางโค้ดชุดนี้ไว้ด้านล่างสุดของสคริปต์เดิมของคุณ
 -- ======================================================================
-
--- 1. สร้าง Tab ใหม่
-local GojoTab = Window:AddTab("Moveset", "swords")
 
 -- 2. สร้าง Groupbox สำหรับปุ่มกด
 local GojoMoves = GojoTab:AddLeftGroupbox("Gojo Moveset")
