@@ -41,9 +41,9 @@ task.spawn(function()
     end
 end)
 
-local Remote = Window:AddTab("Remote", "zap")      -- แท็บที่ 1
+local MainTab = Window:AddTab("Main", "home")      -- แท็บที่ 1
 local MTab = Window:AddTab("Moveset", "swords")    -- แท็บที่ 2 (ตรงกลาง)
-local Setting = Window:AddTab("Settings", "settings") -- แท็บที่ 3
+local SettingsTab = Window:AddTab("Settings", "settings") -- แท็บที่ 3
 
 -- ESP Container
 local espFolder = Instance.new("Folder")
