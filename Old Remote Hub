@@ -43,8 +43,6 @@ end)
 
 local Tabs = {
     Remote = Window:AddTab("Remote", "zap"),
-    MTab = Window:AddTab("Moveset", "swords"),
-    Setting = Window:AddTab("Setting", "settings"),
 }
 
 -- ESP Container
@@ -553,6 +551,8 @@ end)
 -- ======================================================================
 
 -- 1. สร้าง Tab ใหม่ (ตรวจสอบว่า Window มีอยู่จริง)
+local MTab = Window:AddTab("Moveset", "swords")
+local Setting = Window:AddTab("Setting", "setting")
 local GBox = MTab:AddLeftGroupbox("Gojo Moveset")
 
 -- 2. ฟังก์ชันสร้างปุ่มสไตล์ตามรูปที่คุณส่งมา
