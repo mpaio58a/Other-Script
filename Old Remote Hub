@@ -376,6 +376,11 @@ for _, instance in ipairs(ReplicatedStorage:GetDescendants()) do
             end
         })
         
+RemoteGroupbox:AddButton({ Text = "Execute", Func = function()
+            local amount = tonumber(savedAmounts[displayName]) or 1
+            for i = 1, amount do instance:FireServer() end
+        end })
+
 RemoteGroupbox:AddButton({ Text = "Add Float Button", Func = function() createOnScreenButton(instance, displayName) end })
 
         -- บันทึกเก็บไว้ซ่อน
@@ -393,11 +398,6 @@ RemoteGroupbox:AddButton({ Text = "Add Float Button", Func = function() createOn
         })
         table.insert(toggleFeaturesUI, _listWaitInput)
         
-        RemoteGroupbox:AddButton({ Text = "Execute", Func = function()
-            local amount = tonumber(savedAmounts[displayName]) or 1
-            for i = 1, amount do instance:FireServer() end
-        end })
-
         -- บันทึกเก็บไว้ซ่อน
         local _listTglBtn = RemoteGroupbox:AddButton({ Text = "Add Float Toggle Button", Func = function() createOnScreenToggle(instance, displayName) end })
         table.insert(toggleFeaturesUI, _listTglBtn)
@@ -682,15 +682,7 @@ for _, move in ipairs(gojoMoves) do
     
     local _amtInput = GojoGroupbox:AddInput(inId, { Default = "1", Numeric = true, Text = "Amount to Fire" })
 
-GojoGroupbox:AddButton({ Text = "Add Float Button", Func = function()
-        createGojoFloatButton(move.Name, move.Path, inId)
-    end })
-
-    -- ส่วนที่ซ่อนได้
-    local _wInput = GojoGroupbox:AddInput(waId, { Default = "1", Numeric = true, Text = "Task.wait() Time" })
-    table.insert(toggleFeaturesUI, _wInput)
-
-    GojoGroupbox:AddButton({ Text = "Execute", Func = function()
+GojoGroupbox:AddButton({ Text = "Execute", Func = function()
         local remote = getRemoteByPath(move.Path)
         if remote then
             local amount = tonumber(Options[inId].Value) or 1
@@ -698,6 +690,14 @@ GojoGroupbox:AddButton({ Text = "Add Float Button", Func = function()
             for i = 1, amount do remote:FireServer() end
         end
     end })
+
+GojoGroupbox:AddButton({ Text = "Add Float Button", Func = function()
+        createGojoFloatButton(move.Name, move.Path, inId)
+    end })
+
+    -- ส่วนที่ซ่อนได้
+    local _wInput = GojoGroupbox:AddInput(waId, { Default = "1", Numeric = true, Text = "Task.wait() Time" })
+    table.insert(toggleFeaturesUI, _wInput)
 
     local _tButton = GojoGroupbox:AddButton({ Text = "Add Float Toggle Button", Func = function()
         createGojoFloatToggle(move.Name, move.Path, waId, inId)
