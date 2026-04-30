@@ -426,6 +426,9 @@ MiscGroupbox:AddToggle("PlayerESP", {
     end
 })
 
+MiscGroupbox:AddButton({ Text = "Respawn", Func = function() game:GetService("ReplicatedStorage"):WaitForChild("Respawn_Plr"):FireServer()
+ end })
+
 MiscGroupbox:AddDivider()
 
 MiscGroupbox:AddInput("AimbotTarget", {
