@@ -1,485 +1,279 @@
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 
 local Window = WindUI:CreateWindow({
-
-Title = "Hubers Gui f3x v2",
-
-Icon = "shield",
-
-Author = "by .ftgs and .ftgs",
-
-Folder = "MySuperHub",
-
-Size = UDim2.fromOffset(580, 460),
-
-MinSize = Vector2.new(560, 350),
-
-MaxSize = Vector2.new(850, 560),
-
-Transparent = true,
-
-Theme = "Dark",
-
-Resizable = true,
-
-SideBarWidth = 200,
-
-BackgroundImageTransparency = 0.42,
-
-HideSearchBar = true,
-
-ScrollBarEnabled = false,
-
-User = {
-
-Enabled = true,
-
-Anonymous = false,
-
-Callback = function()
-
-print("User clicked!")
-
-end,
-
-},
-
--- KeySystem foi REMOVIDO completamente
-
--- Nenhuma key, nenhum grace, abre direto
-
+    Title = "Hubers Gui f3x v2",
+    Icon = "shield",
+    Author = "by .ftgs and .ftgs",
+    Folder = "MySuperHub",
+    Size = UDim2.fromOffset(580, 460),
+    MinSize = Vector2.new(560, 350),
+    MaxSize = Vector2.new(850, 560),
+    Transparent = true,
+    Theme = "Dark",
+    Resizable = true,
+    SideBarWidth = 200,
+    BackgroundImageTransparency = 0.42,
+    HideSearchBar = true,
+    ScrollBarEnabled = false,
+    User = {
+        Enabled = true,
+        Anonymous = false,
+        Callback = function()
+            print("User clicked!")
+        end,
+    },
 })
 
--- O resto do código continua igual (tabs, toggles, etc.)
-
+-- ========================================================
+-- Tab: Principal (Main)
+-- ========================================================
 local MainTab = Window:Tab({ Title = "Principal", Icon = "home" })
 
 MainTab:Button({
-
-Title = "decal",
-
-Callback = function()
-
-loadstring(game:HttpGet("https://pastefy.app/85R8LirJ/raw"))()
-
-end
-
+    Title = "decal",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastefy.app/85R8LirJ/raw"))()
+    end
 })
 
 MainTab:Button({
-
-Title = "skybox",
-
-Callback = function()
-
-loadstring(game:HttpGet("https://pastefy.app/74hUMxEb/raw"))()
-
-end
-
+    Title = "skybox",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastefy.app/74hUMxEb/raw"))()
+    end
 })
 
 MainTab:Button({
-
-Title = "theme",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";Music 86545460540584")
-
-     RequestCommand:InvokeServer(";Pitch 0.12")
-
-     RequestCommand:InvokeServer(";Volume inf")
-
-end
-
+    Title = "theme",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";Music 86545460540584")
+        RequestCommand:InvokeServer(";Pitch 0.12")
+        RequestCommand:InvokeServer(";Volume inf")
+    end
 })
 
 MainTab:Button({
-
-Title = "all nigger",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";Music 112226782551255")
-
-     RequestCommand:InvokeServer(";Pitch 0.12")
-
-     RequestCommand:InvokeServer(";Volume inf")
-
-end
-
+    Title = "all nigger",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";Music 112226782551255")
+        RequestCommand:InvokeServer(";Pitch 0.12")
+        RequestCommand:InvokeServer(";Volume inf")
+    end
 })
 
 MainTab:Button({
-
-Title = "Fast Souds robloxiana",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";Music 89391873510832")
-
-     RequestCommand:InvokeServer(";Pitch 0.12")
-
-     RequestCommand:InvokeServer(";Volume inf")
-
-end
-
+    Title = "Fast Souds robloxiana",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";Music 89391873510832")
+        RequestCommand:InvokeServer(";Pitch 0.12")
+        RequestCommand:InvokeServer(";Volume inf")
+    end
 })
 
 MainTab:Button({
-
-Title = "gun 1",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";Gear me 116693764")
-
-end
-
+    Title = "gun 1",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";Gear me 116693764")
+    end
 })
 
 MainTab:Button({
-
-Title = "gun 2",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";Gear me 94233344")
-
-end
-
+    Title = "gun 2",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";Gear me 94233344")
+    end
 })
 
 MainTab:Button({
-
-Title = "snake sniper",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";Gear me 113299620")
-
-end
-
+    Title = "snake sniper",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";Gear me 113299620")
+    end
 })
 
 MainTab:Button({
-
-Title = "skeleton skybox",
-
-Callback = function()
-
-loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-EPIK-SKELETON-SKYBOX-F3X-Updated-38026"))()
-
-end
-
+    Title = "skeleton skybox",
+    Callback = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-EPIK-SKELETON-SKYBOX-F3X-Updated-38026"))()
+    end
 })
 
 MainTab:Button({
-
-Title = "menssage",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";sm hubers9370 WILL HACKED THIS MAP!! 🤑✌️🙏")
-
-end
-
+    Title = "menssage",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";sm hubers9370 WILL HACKED THIS MAP!! 🤑✌️🙏")
+    end
 })
 
 MainTab:Button({
-
-Title = "r6",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";r6")
-
-end
-
+    Title = "r6",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";r6")
+    end
 })
 
 MainTab:Button({
-
-Title = "btools",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";btools")
-
-end
-
+    Title = "btools",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";btools")
+    end
 })
 
 MainTab:Button({
-
-Title = "disco + fog",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";disco ;fog")
-
-end
-
+    Title = "disco + fog",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";disco ;fog")
+    end
 })
 
 MainTab:Button({
-
-Title = "bring all",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";bring all ;tp all")
-
-end
-
+    Title = "bring all",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";bring all ;tp all")
+    end
 })
 
 MainTab:Button({
-
-Title = "kill others",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";kill others")
-
-end
-
+    Title = "kill others",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";kill others")
+    end
 })
 
 MainTab:Button({
-
-Title = "fire others",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";fire others")
-
-end
-
+    Title = "fire others",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";fire others")
+    end
 })
 
 MainTab:Button({
-
-Title = "time to obunga rain",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";sm time to obunga rain ")
-
-	loadstring(game:HttpGet("https://pastebin.com/raw/4RVkHQQi"))()
-
-end
-
+    Title = "time to obunga rain",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";sm time to obunga rain ")
+        loadstring(game:HttpGet("https://pastebin.com/raw/4RVkHQQi"))()
+    end
 })
 
 MainTab:Button({
-
-Title = "title others",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";title others Join team hubers9370 today")
-
-end
-
+    Title = "title others",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";title others Join team hubers9370 today")
+    end
 })
 
 MainTab:Button({
-
-Title = "title me",
-
-Callback = function()
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
-
-	RequestCommand:InvokeServer(";title me fi bipiz on top")
-
-end
-
+    Title = "title me",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+        RequestCommand:InvokeServer(";title me fi bipiz on top")
+    end
 })
 
 MainTab:Button({
-
-Title = "Oninon troll face decal",
-
-Callback = function()
-
-loadstring(game:HttpGet("https://pastebin.com/raw/gn979fys"))()
-
-end
-
+    Title = "Oninon troll face decal",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/gn979fys"))()
+    end
 })
 
 MainTab:Button({
-
-Title = "rotating skybox",
-
-Callback = function()
-
-loadstring(game:HttpGet("https://pastefy.app/dYTCdEZS/raw"))()
-
-end
-
+    Title = "rotating skybox",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastefy.app/dYTCdEZS/raw"))()
+    end
 })
 
 MainTab:Button({
-
-Title = "floating duck orb",
-
-Callback = function()
-
-loadstring(game:HttpGet("https://pastefy.app/NdSo5hrM/raw"))()
-
-end
-
+    Title = "floating duck orb",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastefy.app/NdSo5hrM/raw"))()
+    end
 })
 
 MainTab:Button({
-
-Title = "shake head",
-
-Callback = function()
-
-loadstring(game:HttpGet("https://pastefy.app/2qxyY7CN/raw"))()
-
-end
-
+    Title = "shake head",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastefy.app/2qxyY7CN/raw"))()
+    end
 })
 
 MainTab:Button({
-
-Title = "chicken arms",
-
-Callback = function()
-
-loadstring(game:HttpGet("https://pastefy.app/oKjpLcxF/raw",true))()
-
-end
-
+    Title = "chicken arms",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastefy.app/oKjpLcxF/raw",true))()
+    end
 })
 
 MainTab:Button({
-
-Title = "mesh disco",
-
-Callback = function()
-
-loadstring(game:HttpGet("https://pastefy.app/MiJLVJLq/raw",true))()
-
-end
-
+    Title = "mesh disco",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastefy.app/MiJLVJLq/raw",true))()
+    end
 })
 
 MainTab:Button({
-
-Title = "goner",
-
-Callback = function()
-
-loadstring(game:HttpGet("https://api.rubis.app/v2/scrap/90QG2RCzyL25UUpR/raw",true))()
-
-end
-
+    Title = "goner",
+    Callback = function()
+        loadstring(game:HttpGet("https://api.rubis.app/v2/scrap/90QG2RCzyL25UUpR/raw",true))()
+    end
 })
 
 MainTab:Button({
-
-Title = "Painis Sword",
-
-Callback = function()
-
-loadstring(game:HttpGet("https://api.rubis.app/v2/scrap/fqSw26Rp69Pdax1b/raw",true))()
-
-end
-
+    Title = "Painis Sword",
+    Callback = function()
+        loadstring(game:HttpGet("https://api.rubis.app/v2/scrap/fqSw26Rp69Pdax1b/raw",true))()
+    end
 })
 
 MainTab:Button({
-
-Title = "brook map realm",
-
-Callback = function()
-
-loadstring(game:HttpGet("https://pastefy.app/ro3UFQaG/raw"))()
-
-end
-
+    Title = "brook map realm",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastefy.app/ro3UFQaG/raw"))()
+    end
 })
 
 WindUI:Notify({
-
-Title = "WindUI carregado!",
-
-Content = "Sem key • Uso livre • Divirta-se!",
-
-Duration = 6,
-
-Image = "success"
-
+    Title = "WindUI carregado!",
+    Content = "Sem key • Uso livre • Divirta-se!",
+    Duration = 6,
+    Image = "success"
 })
 
+-- ========================================================
+-- F3X Utility Functions
+-- ========================================================
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
@@ -673,17 +467,107 @@ function Actions.ToadRain()
 end
 
 -- ========================================================
--- ตัวอย่างการเชื่อมต่อกับแท็บ Principal / Main UI Library
+-- Tab: LNicky (แปลงจาก LNicky_F3X_Script_Gui_v3_60)
 -- ========================================================
+local LNickyTab = Window:Tab({ Title = "LNicky", Icon = "terminal" })
 
--- PrincipalTab:AddButton({ Title = "Get F3X", Callback = Actions.GetF3X })
--- PrincipalTab:AddButton({ Title = "Delete All", Callback = Actions.DeleteAll })
--- PrincipalTab:AddButton({ Title = "Fire All", Callback = Actions.FireAll })
--- PrincipalTab:AddButton({ Title = "Skybox Default", Callback = function() Actions.SetSkybox("77053619446045") end })
--- PrincipalTab:AddButton({ Title = "B2S Skybox", Callback = function() Actions.SetSkybox("118939541671382") end })
--- PrincipalTab:AddButton({ Title = "Shedletsky Skybox", Callback = function() Actions.SetSkybox("172423468") end })
--- PrincipalTab:AddButton({ Title = "Decal Spam", Callback = function() Actions.SpamDecal("77053619446045") end })
--- PrincipalTab:AddButton({ Title = "B2S Decal", Callback = function() Actions.SpamDecal("118939541671382") end })
--- PrincipalTab:AddButton({ Title = "Shedletsky Decal", Callback = function() Actions.SpamDecal("172423468") end })
--- PrincipalTab:AddButton({ Title = "Burger Rain", Callback = Actions.BurgerRain })
--- PrincipalTab:AddButton({ Title = "Toad Rain", Callback = Actions.ToadRain })
+LNickyTab:Button({
+    Title = "Get F3X",
+    Callback = function()
+        Actions.GetF3X()
+    end
+})
+
+LNickyTab:Button({
+    Title = "Noot Noot!",
+    Callback = function()
+        local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+        RequestCommand:InvokeServer(";music 104576360535209")
+        RequestCommand:InvokeServer(";pitch 0.2")
+        RequestCommand:InvokeServer(";volume inf")
+        task.wait(9)
+        RequestCommand:InvokeServer(";music 236932924")
+        RequestCommand:InvokeServer(";volume inf")
+        task.wait(1.124)
+        RequestCommand:InvokeServer(";music 1839931391")
+        RequestCommand:InvokeServer(";volume inf")
+
+        task.spawn(function()
+            for i = 1, 11 do
+                RequestCommand:InvokeServer(";explode others")
+                task.wait(2)
+            end
+        end)
+
+        task.spawn(function()
+            task.wait(10.2)
+            Actions.SetSkybox("382332426")
+            Actions.SpamDecal("382332426")
+
+            -- Rain Noot Noot
+            task.spawn(function()
+                while true do
+                    task.wait(0.01)
+                    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                        local hrpcf = LocalPlayer.Character.HumanoidRootPart.CFrame
+                        local xloc = math.random(-600, 600) + hrpcf.x
+                        local zloc = math.random(-600, 600) + hrpcf.z
+                        local yloc = hrpcf.y + math.random(400, 800)
+
+                        task.spawn(function()
+                            F3X.CreatePart(CFrame.new(math.floor(xloc), yloc, math.floor(zloc)))
+                            for _, v in ipairs(Workspace:GetDescendants()) do
+                                if v.Name == "Part" and v.Parent == Workspace and v.CFrame.x == math.floor(xloc) and v.CFrame.z == math.floor(zloc) then
+                                    F3X.SetName(v, "NOOT NOOT")
+                                    F3X.SetAnchor(false, v)
+                                    F3X.AddMesh(v)
+                                    F3X.Resize(v, Vector3.new(1, 1, 1), v.CFrame)
+                                    F3X.MeshResize(v, Vector3.new(500, 500, 500))
+                                    F3X.SetMesh(v, "111891702759441")
+                                    F3X.SetTexture(v, "382332426")
+                                    F3X.SetCollision(v, true)
+                                end
+                            end
+                        end)
+                    end
+                end
+            end)
+
+            Actions.SetSkybox("95921788891849")
+
+            while true do
+                Actions.SpamDecal("382332426")
+                task.wait(1)
+            end
+        end)
+    end
+})
+
+LNickyTab:Button({
+    Title = "skybox",
+    Callback = function()
+        Actions.SetSkybox("77053619446045")
+    end
+})
+
+LNickyTab:Button({
+    Title = "decal spam",
+    Callback = function()
+        Actions.SpamDecal("77053619446045")
+    end
+})
+
+LNickyTab:Button({
+    Title = "fire all",
+    Callback = function()
+        Actions.FireAll()
+    end
+})
+
+LNickyTab:Button({
+    Title = "delete all",
+    Callback = function()
+        Actions.DeleteAll()
+    end
+})
