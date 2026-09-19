@@ -1,0 +1,689 @@
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+
+local Window = WindUI:CreateWindow({
+
+Title = "Hubers Gui f3x v2",
+
+Icon = "shield",
+
+Author = "by .ftgs and .ftgs",
+
+Folder = "MySuperHub",
+
+Size = UDim2.fromOffset(580, 460),
+
+MinSize = Vector2.new(560, 350),
+
+MaxSize = Vector2.new(850, 560),
+
+Transparent = true,
+
+Theme = "Dark",
+
+Resizable = true,
+
+SideBarWidth = 200,
+
+BackgroundImageTransparency = 0.42,
+
+HideSearchBar = true,
+
+ScrollBarEnabled = false,
+
+User = {
+
+Enabled = true,
+
+Anonymous = false,
+
+Callback = function()
+
+print("User clicked!")
+
+end,
+
+},
+
+-- KeySystem foi REMOVIDO completamente
+
+-- Nenhuma key, nenhum grace, abre direto
+
+})
+
+-- O resto do código continua igual (tabs, toggles, etc.)
+
+local MainTab = Window:Tab({ Title = "Principal", Icon = "home" })
+
+MainTab:Button({
+
+Title = "decal",
+
+Callback = function()
+
+loadstring(game:HttpGet("https://pastefy.app/85R8LirJ/raw"))()
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "skybox",
+
+Callback = function()
+
+loadstring(game:HttpGet("https://pastefy.app/74hUMxEb/raw"))()
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "theme",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";Music 86545460540584")
+
+     RequestCommand:InvokeServer(";Pitch 0.12")
+
+     RequestCommand:InvokeServer(";Volume inf")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "all nigger",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";Music 112226782551255")
+
+     RequestCommand:InvokeServer(";Pitch 0.12")
+
+     RequestCommand:InvokeServer(";Volume inf")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "Fast Souds robloxiana",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";Music 89391873510832")
+
+     RequestCommand:InvokeServer(";Pitch 0.12")
+
+     RequestCommand:InvokeServer(";Volume inf")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "gun 1",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";Gear me 116693764")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "gun 2",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";Gear me 94233344")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "snake sniper",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";Gear me 113299620")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "skeleton skybox",
+
+Callback = function()
+
+loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-EPIK-SKELETON-SKYBOX-F3X-Updated-38026"))()
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "menssage",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";sm hubers9370 WILL HACKED THIS MAP!! 🤑✌️🙏")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "r6",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";r6")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "btools",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";btools")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "disco + fog",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";disco ;fog")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "bring all",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";bring all ;tp all")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "kill others",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";kill others")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "fire others",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";fire others")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "time to obunga rain",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";sm time to obunga rain ")
+
+	loadstring(game:HttpGet("https://pastebin.com/raw/4RVkHQQi"))()
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "title others",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";title others Join team hubers9370 today")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "title me",
+
+Callback = function()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+	local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+
+	RequestCommand:InvokeServer(";title me fi bipiz on top")
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "Oninon troll face decal",
+
+Callback = function()
+
+loadstring(game:HttpGet("https://pastebin.com/raw/gn979fys"))()
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "rotating skybox",
+
+Callback = function()
+
+loadstring(game:HttpGet("https://pastefy.app/dYTCdEZS/raw"))()
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "floating duck orb",
+
+Callback = function()
+
+loadstring(game:HttpGet("https://pastefy.app/NdSo5hrM/raw"))()
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "shake head",
+
+Callback = function()
+
+loadstring(game:HttpGet("https://pastefy.app/2qxyY7CN/raw"))()
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "chicken arms",
+
+Callback = function()
+
+loadstring(game:HttpGet("https://pastefy.app/oKjpLcxF/raw",true))()
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "mesh disco",
+
+Callback = function()
+
+loadstring(game:HttpGet("https://pastefy.app/MiJLVJLq/raw",true))()
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "goner",
+
+Callback = function()
+
+loadstring(game:HttpGet("https://api.rubis.app/v2/scrap/90QG2RCzyL25UUpR/raw",true))()
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "Painis Sword",
+
+Callback = function()
+
+loadstring(game:HttpGet("https://api.rubis.app/v2/scrap/fqSw26Rp69Pdax1b/raw",true))()
+
+end
+
+})
+
+MainTab:Button({
+
+Title = "brook map realm",
+
+Callback = function()
+
+loadstring(game:HttpGet("https://pastefy.app/ro3UFQaG/raw"))()
+
+end
+
+})
+
+WindUI:Notify({
+
+Title = "WindUI carregado!",
+
+Content = "Sem key • Uso livre • Divirta-se!",
+
+Duration = 6,
+
+Image = "success"
+
+})
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+
+local LocalPlayer = Players.LocalPlayer
+
+local function GetSyncAPI()
+    local tool
+    for _, v in ipairs(LocalPlayer:GetDescendants()) do
+        if v.Name == "SyncAPI" then tool = v.Parent break end
+    end
+    if not tool then
+        for _, v in ipairs(ReplicatedStorage:GetDescendants()) do
+            if v.Name == "SyncAPI" then tool = v.Parent break end
+        end
+    end
+    return tool and tool:FindFirstChild("SyncAPI") and tool.SyncAPI:FindFirstChild("ServerEndpoint")
+end
+
+local function InvokeF3X(...)
+    local remote = GetSyncAPI()
+    if remote then
+        remote:InvokeServer(...)
+    end
+end
+
+local F3X = {
+    CreatePart = function(cf, parent)
+        InvokeF3X("CreatePart", "Normal", cf, parent or Workspace)
+    end,
+    SetAnchor = function(boolean, part)
+        InvokeF3X("SyncAnchor", {{["Part"] = part, ["Anchored"] = boolean}})
+    end,
+    SetCollision = function(part, boolean)
+        InvokeF3X("SyncCollision", {{["Part"] = part, ["CanCollide"] = boolean}})
+    end,
+    Resize = function(part, size, cf)
+        InvokeF3X("SyncResize", {{["Part"] = part, ["CFrame"] = cf, ["Size"] = size}})
+    end,
+    AddMesh = function(part)
+        InvokeF3X("CreateMeshes", {{["Part"] = part}})
+    end,
+    SetMesh = function(part, meshid)
+        InvokeF3X("SyncMesh", {{["Part"] = part, ["MeshId"] = "rbxassetid://" .. meshid}})
+    end,
+    SetTexture = function(part, texid)
+        InvokeF3X("SyncMesh", {{["Part"] = part, ["TextureId"] = "rbxassetid://" .. texid}})
+    end,
+    MeshResize = function(part, size)
+        InvokeF3X("SyncMesh", {{["Part"] = part, ["Scale"] = size}})
+    end,
+    SetName = function(part, name)
+        InvokeF3X("SetName", {{part}}, name)
+    end,
+    SetLocked = function(part, boolean)
+        InvokeF3X("SetLocked", {{part}}, boolean)
+    end,
+    SpawnDecal = function(part, side)
+        InvokeF3X("CreateTextures", {{["Part"] = part, ["Face"] = side, ["TextureType"] = "Decal"}})
+    end,
+    AddDecal = function(part, asset, side)
+        InvokeF3X("SyncTexture", {{["Part"] = part, ["Face"] = side, ["TextureType"] = "Decal", ["Texture"] = "rbxassetid://" .. asset}})
+    end,
+    DestroyPart = function(part)
+        InvokeF3X("Remove", {{part}})
+    end
+}
+
+local Actions = {}
+
+function Actions.GetF3X()
+    local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommand
+    RequestCommand:InvokeServer(";btools")
+    RequestCommand:InvokeServer(";buildingTools")
+end
+
+function Actions.SetSkybox(id)
+    local char = LocalPlayer.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    local pos = char.HumanoidRootPart.CFrame
+    local e, f, g = pos.x, pos.y, pos.z
+    F3X.CreatePart(CFrame.new(math.floor(e), math.floor(f), math.floor(g)) + Vector3.new(0, 6, 0), Workspace)
+    
+    for _, v in ipairs(Workspace:GetDescendants()) do
+        if v:IsA("BasePart") and v.CFrame.x == math.floor(e) and v.CFrame.z == math.floor(g) then
+            F3X.SetName(v, "Sky")
+            F3X.AddMesh(v)
+            F3X.SetMesh(v, "111891702759441")
+            F3X.SetTexture(v, id)
+            F3X.MeshResize(v, Vector3.new(3600, 3600, 3600))
+            F3X.SetLocked(v, true)
+        end
+    end
+end
+
+function Actions.SpamDecal(id)
+    for _, v in ipairs(Workspace:GetDescendants()) do
+        if v:IsA("BasePart") then
+            task.spawn(function()
+                F3X.SetLocked(v, false)
+                for _, side in ipairs(Enum.NormalId:GetEnumItems()) do
+                    F3X.SpawnDecal(v, side)
+                    F3X.AddDecal(v, id, side)
+                end
+            end)
+        end
+    end
+end
+
+function Actions.FireAll()
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj:IsA("BasePart") then
+            InvokeF3X("CreateDecorations", {{["Part"] = obj, ["DecorationType"] = "Fire"}})
+            InvokeF3X("SyncDecorate", {{["Part"] = obj, ["DecorationType"] = "Fire", ["Size"] = 20}})
+        end
+    end
+end
+
+function Actions.DeleteAll()
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p.Character then
+            pcall(function() F3X.DestroyPart(p.Character) end)
+        end
+    end
+    task.wait(0.5)
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj:IsA("Part") or obj:IsA("MeshPart") then
+            F3X.DestroyPart(obj)
+        end
+    end
+end
+
+function Actions.BurgerRain()
+    task.spawn(function()
+        while true do
+            task.wait(0.1)
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                local hrpcf = LocalPlayer.Character.HumanoidRootPart.CFrame
+                local xloc = math.random(-600, 600) + hrpcf.x
+                local zloc = math.random(-600, 600) + hrpcf.z
+                local yloc = hrpcf.y + math.random(400, 800)
+
+                task.spawn(function()
+                    F3X.CreatePart(CFrame.new(math.floor(xloc), yloc, math.floor(zloc)))
+                    for _, v in ipairs(Workspace:GetDescendants()) do
+                        if v.Name == "Part" and v.Parent == Workspace and v.CFrame.x == math.floor(xloc) and v.CFrame.z == math.floor(zloc) then
+                            F3X.SetName(v, "GET BURGERED!")
+                            F3X.SetAnchor(false, v)
+                            F3X.AddMesh(v)
+                            F3X.Resize(v, Vector3.new(45, 35, 40), v.CFrame)
+                            F3X.MeshResize(v, Vector3.new(45, 35, 40))
+                            F3X.SetMesh(v, "16646125")
+                            F3X.SetTexture(v, "16432575")
+                            F3X.SetCollision(v, true)
+                        end
+                    end
+                end)
+            end
+        end
+    end)
+end
+
+function Actions.ToadRain()
+    task.spawn(function()
+        while true do
+            task.wait(0.1)
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                local hrpcf = LocalPlayer.Character.HumanoidRootPart.CFrame
+                local xloc = math.random(-600, 600) + hrpcf.x
+                local zloc = math.random(-600, 600) + hrpcf.z
+                local yloc = hrpcf.y + math.random(400, 800)
+
+                task.spawn(function()
+                    F3X.CreatePart(CFrame.new(math.floor(xloc), yloc, math.floor(zloc)))
+                    for _, v in ipairs(Workspace:GetDescendants()) do
+                        if v.Name == "Part" and v.Parent == Workspace and v.CFrame.x == math.floor(xloc) and v.CFrame.z == math.floor(zloc) then
+                            F3X.SetName(v, "b_1337")
+                            F3X.SetAnchor(false, v)
+                            F3X.AddMesh(v)
+                            F3X.Resize(v, Vector3.new(100, 100, 100), v.CFrame)
+                            F3X.MeshResize(v, Vector3.new(4, 4, 4))
+                            F3X.SetMesh(v, "5038530279")
+                            F3X.SetTexture(v, "5038530309")
+                            F3X.SetCollision(v, false)
+                        end
+                    end
+                end)
+            end
+        end
+    end)
+end
+
+-- ========================================================
+-- ตัวอย่างการเชื่อมต่อกับแท็บ Principal / Main UI Library
+-- ========================================================
+
+-- PrincipalTab:AddButton({ Title = "Get F3X", Callback = Actions.GetF3X })
+-- PrincipalTab:AddButton({ Title = "Delete All", Callback = Actions.DeleteAll })
+-- PrincipalTab:AddButton({ Title = "Fire All", Callback = Actions.FireAll })
+-- PrincipalTab:AddButton({ Title = "Skybox Default", Callback = function() Actions.SetSkybox("77053619446045") end })
+-- PrincipalTab:AddButton({ Title = "B2S Skybox", Callback = function() Actions.SetSkybox("118939541671382") end })
+-- PrincipalTab:AddButton({ Title = "Shedletsky Skybox", Callback = function() Actions.SetSkybox("172423468") end })
+-- PrincipalTab:AddButton({ Title = "Decal Spam", Callback = function() Actions.SpamDecal("77053619446045") end })
+-- PrincipalTab:AddButton({ Title = "B2S Decal", Callback = function() Actions.SpamDecal("118939541671382") end })
+-- PrincipalTab:AddButton({ Title = "Shedletsky Decal", Callback = function() Actions.SpamDecal("172423468") end })
+-- PrincipalTab:AddButton({ Title = "Burger Rain", Callback = Actions.BurgerRain })
+-- PrincipalTab:AddButton({ Title = "Toad Rain", Callback = Actions.ToadRain })
