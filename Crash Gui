@@ -1,0 +1,231 @@
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+if CoreGui:FindFirstChild("MeshModifierGUI") then
+    CoreGui.MeshModifierGUI:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MeshModifierGUI"
+ScreenGui.Parent = CoreGui
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 270, 0, 220)
+MainFrame.Position = UDim2.new(0.5, -135, 0.5, -110)
+MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Text = "Mesh Tool"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+Title.Parent = MainFrame
+
+local PartNameLabel = Instance.new("TextLabel")
+PartNameLabel.Size = UDim2.new(0.9, 0, 0, 30)
+PartNameLabel.Position = UDim2.new(0.05, 0, 0, 40)
+PartNameLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+PartNameLabel.Text = "Part: None"
+PartNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+PartNameLabel.Font = Enum.Font.Gotham
+PartNameLabel.TextSize = 13
+PartNameLabel.TextScaled = true
+PartNameLabel.Parent = MainFrame
+
+local UICorner_Label = Instance.new("UICorner")
+UICorner_Label.CornerRadius = UDim.new(0, 6)
+UICorner_Label.Parent = PartNameLabel
+
+local SelectButton = Instance.new("TextButton")
+SelectButton.Size = UDim2.new(0.9, 0, 0, 35)
+SelectButton.Position = UDim2.new(0.05, 0, 0, 80)
+SelectButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+SelectButton.Text = "เลือกPart (OFF)"
+SelectButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SelectButton.Font = Enum.Font.GothamBold
+SelectButton.TextSize = 14
+SelectButton.Parent = MainFrame
+
+local UICorner_Select = Instance.new("UICorner")
+UICorner_Select.CornerRadius = UDim.new(0, 6)
+UICorner_Select.Parent = SelectButton
+
+local SelectAllButton = Instance.new("TextButton")
+SelectAllButton.Size = UDim2.new(0.9, 0, 0, 35)
+SelectAllButton.Position = UDim2.new(0.05, 0, 0, 125)
+SelectAllButton.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+SelectAllButton.Text = "เลือกPart ทั้งหมด"
+SelectAllButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SelectAllButton.Font = Enum.Font.GothamBold
+SelectAllButton.TextSize = 14
+SelectAllButton.Parent = MainFrame
+
+local UICorner_SelectAll = Instance.new("UICorner")
+UICorner_SelectAll.CornerRadius = UDim.new(0, 6)
+UICorner_SelectAll.Parent = SelectAllButton
+
+local ApplyButton = Instance.new("TextButton")
+ApplyButton.Size = UDim2.new(0.9, 0, 0, 35)
+ApplyButton.Position = UDim2.new(0.05, 0, 0, 170)
+ApplyButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
+ApplyButton.Text = "ปรับแต่ง Part"
+ApplyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ApplyButton.Font = Enum.Font.GothamBold
+ApplyButton.TextSize = 14
+ApplyButton.Parent = MainFrame
+
+local UICorner_Apply = Instance.new("UICorner")
+UICorner_Apply.CornerRadius = UDim.new(0, 6)
+UICorner_Apply.Parent = ApplyButton
+
+local isSelecting = false
+local isAllSelected = false
+local selectedParts = {}
+
+local function updateLabel()
+    local count = 0
+    local lastPartName = ""
+    
+    for part in pairs(selectedParts) do
+        count = count + 1
+        lastPartName = part.Name
+    end
+    
+    if count == 1 then
+        PartNameLabel.Text = "Part: " .. lastPartName
+    elseif count > 1 then
+        PartNameLabel.Text = "Part: Selected (" .. tostring(count) .. ")"
+    else
+        PartNameLabel.Text = "Part: None"
+    end
+end
+
+SelectButton.MouseButton1Click:Connect(function()
+    isSelecting = not isSelecting
+    if isSelecting then
+        SelectButton.Text = "เลือกPart (ON)"
+        SelectButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    else
+        SelectButton.Text = "เลือกPart (OFF)"
+        SelectButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    end
+end)
+
+SelectAllButton.MouseButton1Click:Connect(function()
+    isAllSelected = not isAllSelected
+    if isAllSelected then
+        SelectAllButton.Text = "ยกเลิกทั้งหมด"
+        SelectAllButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and not obj:IsA("Terrain") then
+                if not selectedParts[obj] then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Name = "SelectionOutline"
+                    highlight.Adornee = obj
+                    highlight.FillTransparency = 1
+                    highlight.OutlineColor = Color3.fromRGB(0, 170, 255)
+                    highlight.OutlineTransparency = 0
+                    highlight.Parent = obj
+
+                    selectedParts[obj] = { Highlight = highlight }
+                end
+            end
+        end
+    else
+        SelectAllButton.Text = "เลือกPart ทั้งหมด"
+        SelectAllButton.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+        
+        for part, data in pairs(selectedParts) do
+            if data.Highlight then
+                data.Highlight:Destroy()
+            end
+        end
+        table.clear(selectedParts)
+    end
+    updateLabel()
+end)
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed or not isSelecting then return end
+
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        local target = mouse.Target
+        if target and target:IsA("BasePart") then
+            if selectedParts[target] then
+                if selectedParts[target].Highlight then
+                    selectedParts[target].Highlight:Destroy()
+                end
+                selectedParts[target] = nil
+            else
+                local highlight = Instance.new("Highlight")
+                highlight.Name = "SelectionOutline"
+                highlight.Adornee = target
+                highlight.FillTransparency = 1
+                highlight.OutlineColor = Color3.fromRGB(0, 170, 255)
+                highlight.OutlineTransparency = 0
+                highlight.Parent = target
+
+                selectedParts[target] = { Highlight = highlight }
+            end
+            updateLabel()
+        end
+    end
+end)
+
+ApplyButton.MouseButton1Click:Connect(function()
+    local backpack = player:FindFirstChild("Backpack")
+    local character = player.Character
+    local btools = (character and character:FindFirstChild("Building Tools")) or (backpack and backpack:FindFirstChild("Building Tools"))
+
+    if not btools or not btools:FindFirstChild("SyncAPI") or not btools.SyncAPI:FindFirstChild("ServerEndpoint") then
+        PartNameLabel.Text = "Please equip 'Building Tools'"
+        task.wait(2)
+        updateLabel()
+        return
+    end
+
+    local ServerEndpoint = btools.SyncAPI.ServerEndpoint
+    local createArgs = {}
+    local syncArgs = {}
+
+    for part in pairs(selectedParts) do
+        if part and part:IsDescendantOf(workspace) then
+            table.insert(createArgs, { Part = part })
+            
+            table.insert(syncArgs, {
+                Part = part,
+                MeshType = Enum.MeshType.FileMesh,
+                MeshId = "rbxassetid://12902786354",
+                Scale = Vector3.new(1000000, 1000000, 1000000)
+            })
+        end
+    end
+
+    if #createArgs > 0 then
+        task.spawn(function()
+            ServerEndpoint:InvokeServer("CreateMeshes", createArgs)
+            ServerEndpoint:InvokeServer("SyncMesh", syncArgs)
+            
+            PartNameLabel.Text = "Applied to Server!"
+            task.wait(2)
+            updateLabel()
+        end)
+    else
+        PartNameLabel.Text = "No Part Selected!"
+        task.wait(2)
+        updateLabel()
+    end
+end)
