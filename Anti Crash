@@ -1,0 +1,68 @@
+local Workspace = game:GetService("Workspace")
+
+local MAX_LIMIT = Vector3.new(100, 100, 100)
+local MAX_ALLOWED_MAGNITUDE = MAX_LIMIT.Magnitude 
+
+local function neutralizeSpecialMesh(specialMesh)
+	if not specialMesh or not specialMesh:IsA("SpecialMesh") then return end
+	if specialMesh:GetAttribute("ClientProtected") then return end 
+	
+	if specialMesh.Scale.Magnitude > MAX_ALLOWED_MAGNITUDE then
+		specialMesh:SetAttribute("ClientProtected", true)
+		specialMesh.Scale = Vector3.new(0, 0, 0)
+		
+		local parent = specialMesh.Parent
+		if parent and parent:IsA("BasePart") then
+			parent.Transparency = 1
+			parent.CastShadow = false
+			parent.CanCollide = false
+			parent.CanQuery = false
+			parent.CanTouch = false
+			parent.Massless = true
+		end
+	end
+end
+
+local function neutralizeMeshPart(meshPart)
+	if not meshPart or not meshPart:IsA("MeshPart") then return end
+	if meshPart:GetAttribute("ClientProtected") then return end
+	
+	if meshPart.Size.Magnitude > MAX_ALLOWED_MAGNITUDE then
+		meshPart:SetAttribute("ClientProtected", true)
+		
+		meshPart.Transparency = 1
+		meshPart.CastShadow = false
+		meshPart.CanCollide = false
+		meshPart.CanQuery = false
+		meshPart.CanTouch = false
+		meshPart.Massless = true
+	end
+end
+
+local function processInstance(inst)
+	if inst:IsA("SpecialMesh") then
+		neutralizeSpecialMesh(inst)
+	elseif inst:IsA("MeshPart") then
+		neutralizeMeshPart(inst)
+	end
+end
+
+for _, descendant in ipairs(Workspace:GetDescendants()) do
+	processInstance(descendant)
+end
+
+Workspace.DescendantAdded:Connect(function(descendant)
+	task.defer(function()
+		processInstance(descendant)
+		
+		if descendant:IsA("SpecialMesh") then
+			descendant:GetPropertyChangedSignal("Scale"):Connect(function()
+				neutralizeSpecialMesh(descendant)
+			end)
+		elseif descendant:IsA("MeshPart") then
+			descendant:GetPropertyChangedSignal("Size"):Connect(function()
+				neutralizeMeshPart(descendant)
+			end)
+		end
+	end)
+end)
