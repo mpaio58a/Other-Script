@@ -2,15 +2,16 @@ local Workspace = game:GetService("Workspace")
 
 local MAX_LIMIT = Vector3.new(10, 10, 10)
 local MAX_ALLOWED_MAGNITUDE = MAX_LIMIT.Magnitude 
+local BATCH_SIZE = 150 -- จำนวนชิ้นที่จะประมวลผลก่อนพัก 1 เฟรม (ปรับลดได้ถ้ายังกระตุก)
 
 local function neutralizeSpecialMesh(specialMesh)
 	if not specialMesh or not specialMesh:IsA("SpecialMesh") then return end
 	if specialMesh:GetAttribute("ClientProtected") then return end 
-	
+
 	if specialMesh.Scale.Magnitude > MAX_ALLOWED_MAGNITUDE then
 		specialMesh:SetAttribute("ClientProtected", true)
 		specialMesh.Scale = Vector3.new(0, 0, 0)
-		
+
 		local parent = specialMesh.Parent
 		if parent and parent:IsA("BasePart") then
 			parent.Transparency = 1
@@ -26,10 +27,10 @@ end
 local function neutralizeMeshPart(meshPart)
 	if not meshPart or not meshPart:IsA("MeshPart") then return end
 	if meshPart:GetAttribute("ClientProtected") then return end
-	
+
 	if meshPart.Size.Magnitude > MAX_ALLOWED_MAGNITUDE then
 		meshPart:SetAttribute("ClientProtected", true)
-		
+
 		meshPart.Transparency = 1
 		meshPart.CastShadow = false
 		meshPart.CanCollide = false
@@ -47,14 +48,24 @@ local function processInstance(inst)
 	end
 end
 
-for _, descendant in ipairs(Workspace:GetDescendants()) do
-	processInstance(descendant)
+-- ฟังก์ชันสแกน Workspace ทั้งหมดแบบไม่ทำให้เกมค้าง
+local function scanWorkspace()
+	local descendants = Workspace:GetDescendants()
+	for i, descendant in ipairs(descendants) do
+		processInstance(descendant)
+		
+		-- เมื่อประมวลผลครบตาม BATCH_SIZE ให้พักการทำงาน 1 เฟรม (กันค้าง)
+		if i % BATCH_SIZE == 0 then
+			task.wait()
+		end
+	end
 end
 
+-- ดักจับเมื่อมีชิ้นส่วนใหม่ถูกสร้างเข้ามาใน Workspace
 Workspace.DescendantAdded:Connect(function(descendant)
 	task.defer(function()
 		processInstance(descendant)
-		
+
 		if descendant:IsA("SpecialMesh") then
 			descendant:GetPropertyChangedSignal("Scale"):Connect(function()
 				neutralizeSpecialMesh(descendant)
@@ -65,4 +76,12 @@ Workspace.DescendantAdded:Connect(function(descendant)
 			end)
 		end
 	end)
+end)
+
+-- สร้าง Loop ตรวจสอบตลอดเวลาแบบปลอดภัย 
+task.spawn(function()
+	while true do
+		scanWorkspace() -- สแกนทั้งหมด (ฟังก์ชันนี้มีการเว้นจังหวะ task.wait() ในตัวอยู่แล้ว)
+		task.wait(5) -- เมื่อสแกนเสร็จ ให้รออีก 5 วินาทีแล้วค่อยเริ่มรอบใหม่ (ลดภาระเซิร์ฟเวอร์/เครื่องลูกค้า)
+	end
 end)
