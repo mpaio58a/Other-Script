@@ -1,6 +1,6 @@
 local Workspace = game:GetService("Workspace")
 
-local MAX_LIMIT = Vector3.new(100, 100, 100)
+local MAX_LIMIT = Vector3.new(10, 10, 10)
 local MAX_ALLOWED_MAGNITUDE = MAX_LIMIT.Magnitude 
 
 local function neutralizeSpecialMesh(specialMesh)
