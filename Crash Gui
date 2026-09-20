@@ -66,7 +66,7 @@ local SelectButton = Instance.new("TextButton")
 SelectButton.Size = UDim2.new(0.72, 0, 0, 35)
 SelectButton.Position = UDim2.new(0.05, 0, 0, 80)
 SelectButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-SelectButton.Text = "Select (OFF)"
+SelectButton.Text = "Select : OFF"
 SelectButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 SelectButton.Font = Enum.Font.GothamBold
 SelectButton.TextSize = 14
@@ -196,10 +196,10 @@ end
 SelectButton.MouseButton1Click:Connect(function()
     isSelecting = not isSelecting
     if isSelecting then
-        SelectButton.Text = "Select (ON)"
+        SelectButton.Text = "Select : ON"
         SelectButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
     else
-        SelectButton.Text = "Select (OFF)"
+        SelectButton.Text = "Select : OFF"
         SelectButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
     end
 end)
