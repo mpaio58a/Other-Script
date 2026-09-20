@@ -76,8 +76,9 @@ local UICorner_SelectAll = Instance.new("UICorner")
 UICorner_SelectAll.CornerRadius = UDim.new(0, 6)
 UICorner_SelectAll.Parent = SelectAllButton
 
+-- แก้ไขปุ่ม Apply ให้เล็กลงเพื่อเว้นที่ให้ปุ่ม ?
 local ApplyButton = Instance.new("TextButton")
-ApplyButton.Size = UDim2.new(0.9, 0, 0, 35)
+ApplyButton.Size = UDim2.new(0.72, 0, 0, 35)
 ApplyButton.Position = UDim2.new(0.05, 0, 0, 170)
 ApplyButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
 ApplyButton.Text = "ปรับแต่ง Part"
@@ -90,6 +91,75 @@ local UICorner_Apply = Instance.new("UICorner")
 UICorner_Apply.CornerRadius = UDim.new(0, 6)
 UICorner_Apply.Parent = ApplyButton
 
+-- เพิ่มปุ่ม ? สีเขียวสว่าง
+local QuestionButton = Instance.new("TextButton")
+QuestionButton.Size = UDim2.new(0.16, 0, 0, 35)
+QuestionButton.Position = UDim2.new(0.79, 0, 0, 170)
+QuestionButton.BackgroundColor3 = Color3.fromRGB(45, 215, 80)
+QuestionButton.Text = "?"
+QuestionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+QuestionButton.Font = Enum.Font.GothamBold
+QuestionButton.TextSize = 24
+QuestionButton.Parent = MainFrame
+
+local UICorner_Question = Instance.new("UICorner")
+UICorner_Question.CornerRadius = UDim.new(0, 6)
+UICorner_Question.Parent = QuestionButton
+
+-- สร้าง UI เมนู Dropdown สำหรับเลือก Mesh
+local ListFrame = Instance.new("Frame")
+ListFrame.Size = UDim2.new(0.9, 0, 0, 100)
+ListFrame.Position = UDim2.new(0.05, 0, 0, 215)
+ListFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+ListFrame.Visible = false
+ListFrame.ZIndex = 10
+ListFrame.Parent = MainFrame
+
+local UICorner_List = Instance.new("UICorner")
+UICorner_List.CornerRadius = UDim.new(0, 6)
+UICorner_List.Parent = ListFrame
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = ListFrame
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- ข้อมูล Mesh ID 
+local meshes = {
+    {name = "crasher", id = "12902786354"},
+    {name = "sussy lag mesh v2", id = "8117754198"},
+    {name = "crash mesh", id = "9056713385"},
+    {name = "crash", id = "11817552355"}
+}
+
+-- ตัวแปรเก็บ ID ปัจจุบัน (ค่าเริ่มต้นเป็นตัวแรก)
+local selectedMeshId = meshes[1].id
+
+-- สร้างรายชื่อในเมนู Dropdown
+for i, meshData in ipairs(meshes) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 25)
+    btn.BackgroundColor3 = (i % 2 == 0) and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(55, 55, 55)
+    btn.BorderSizePixel = 0
+    btn.Text = "  " .. meshData.name
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 13
+    btn.ZIndex = 11
+    btn.Parent = ListFrame
+
+    -- เมื่อกดเลือก Mesh
+    btn.MouseButton1Click:Connect(function()
+        selectedMeshId = meshData.id
+        ListFrame.Visible = false -- ปิดเมนูหลังจากเลือก
+    end)
+end
+
+-- เปิด/ปิด เมนูเมื่อกดปุ่ม ?
+QuestionButton.MouseButton1Click:Connect(function()
+    ListFrame.Visible = not ListFrame.Visible
+end)
+
 local isSelecting = false
 local isAllSelected = false
 local selectedParts = {}
@@ -97,12 +167,12 @@ local selectedParts = {}
 local function updateLabel()
     local count = 0
     local lastPartName = ""
-    
+
     for part in pairs(selectedParts) do
         count = count + 1
         lastPartName = part.Name
     end
-    
+
     if count == 1 then
         PartNameLabel.Text = "Part: " .. lastPartName
     elseif count > 1 then
@@ -128,7 +198,7 @@ SelectAllButton.MouseButton1Click:Connect(function()
     if isAllSelected then
         SelectAllButton.Text = "ยกเลิกทั้งหมด"
         SelectAllButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-        
+
         for _, obj in pairs(workspace:GetDescendants()) do
             if obj:IsA("BasePart") and not obj:IsA("Terrain") then
                 if not selectedParts[obj] then
@@ -147,7 +217,7 @@ SelectAllButton.MouseButton1Click:Connect(function()
     else
         SelectAllButton.Text = "เลือกPart ทั้งหมด"
         SelectAllButton.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
-        
+
         for part, data in pairs(selectedParts) do
             if data.Highlight then
                 data.Highlight:Destroy()
@@ -204,11 +274,12 @@ ApplyButton.MouseButton1Click:Connect(function()
     for part in pairs(selectedParts) do
         if part and part:IsDescendantOf(workspace) then
             table.insert(createArgs, { Part = part })
-            
+
             table.insert(syncArgs, {
                 Part = part,
                 MeshType = Enum.MeshType.FileMesh,
-                MeshId = "rbxassetid://12902786354",
+                -- นำ ID จากตัวแปรที่ถูกเลือกไว้มาใส่ในลิงก์
+                MeshId = "rbxassetid://" .. selectedMeshId,
                 Scale = Vector3.new(1000000, 1000000, 1000000)
             })
         end
@@ -218,7 +289,7 @@ ApplyButton.MouseButton1Click:Connect(function()
         task.spawn(function()
             ServerEndpoint:InvokeServer("CreateMeshes", createArgs)
             ServerEndpoint:InvokeServer("SyncMesh", syncArgs)
-            
+
             PartNameLabel.Text = "Applied to Server!"
             task.wait(2)
             updateLabel()
