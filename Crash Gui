@@ -12,9 +12,23 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "MeshModifierGUI"
 ScreenGui.Parent = CoreGui
 
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 45, 0, 45)
+ToggleButton.Position = UDim2.new(0, 0, 0.5, -22)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+ToggleButton.Text = "UI"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 16
+ToggleButton.Parent = ScreenGui
+
+local UICorner_Toggle = Instance.new("UICorner")
+UICorner_Toggle.CornerRadius = UDim.new(0, 8)
+UICorner_Toggle.Parent = ToggleButton
+
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 270, 0, 220)
-MainFrame.Position = UDim2.new(0.5, -135, 0.5, -110)
+MainFrame.Size = UDim2.new(0, 270, 0, 175)
+MainFrame.Position = UDim2.new(0.5, -135, 0.5, -87)
 MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 MainFrame.Active = true
 MainFrame.Draggable = true
@@ -49,10 +63,10 @@ UICorner_Label.CornerRadius = UDim.new(0, 6)
 UICorner_Label.Parent = PartNameLabel
 
 local SelectButton = Instance.new("TextButton")
-SelectButton.Size = UDim2.new(0.9, 0, 0, 35)
+SelectButton.Size = UDim2.new(0.72, 0, 0, 35)
 SelectButton.Position = UDim2.new(0.05, 0, 0, 80)
 SelectButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-SelectButton.Text = "เลือกPart (OFF)"
+SelectButton.Text = "Select (OFF)"
 SelectButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 SelectButton.Font = Enum.Font.GothamBold
 SelectButton.TextSize = 14
@@ -63,25 +77,24 @@ UICorner_Select.CornerRadius = UDim.new(0, 6)
 UICorner_Select.Parent = SelectButton
 
 local SelectAllButton = Instance.new("TextButton")
-SelectAllButton.Size = UDim2.new(0.9, 0, 0, 35)
-SelectAllButton.Position = UDim2.new(0.05, 0, 0, 125)
+SelectAllButton.Size = UDim2.new(0.16, 0, 0, 35)
+SelectAllButton.Position = UDim2.new(0.79, 0, 0, 80)
 SelectAllButton.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
-SelectAllButton.Text = "เลือกPart ทั้งหมด"
+SelectAllButton.Text = "All"
 SelectAllButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 SelectAllButton.Font = Enum.Font.GothamBold
-SelectAllButton.TextSize = 14
+SelectAllButton.TextSize = 13
 SelectAllButton.Parent = MainFrame
 
 local UICorner_SelectAll = Instance.new("UICorner")
 UICorner_SelectAll.CornerRadius = UDim.new(0, 6)
 UICorner_SelectAll.Parent = SelectAllButton
 
--- แก้ไขปุ่ม Apply ให้เล็กลงเพื่อเว้นที่ให้ปุ่ม ?
 local ApplyButton = Instance.new("TextButton")
 ApplyButton.Size = UDim2.new(0.72, 0, 0, 35)
-ApplyButton.Position = UDim2.new(0.05, 0, 0, 170)
+ApplyButton.Position = UDim2.new(0.05, 0, 0, 125)
 ApplyButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
-ApplyButton.Text = "ปรับแต่ง Part"
+ApplyButton.Text = "Apply : OFF"
 ApplyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ApplyButton.Font = Enum.Font.GothamBold
 ApplyButton.TextSize = 14
@@ -91,10 +104,9 @@ local UICorner_Apply = Instance.new("UICorner")
 UICorner_Apply.CornerRadius = UDim.new(0, 6)
 UICorner_Apply.Parent = ApplyButton
 
--- เพิ่มปุ่ม ? สีเขียวสว่าง
 local QuestionButton = Instance.new("TextButton")
 QuestionButton.Size = UDim2.new(0.16, 0, 0, 35)
-QuestionButton.Position = UDim2.new(0.79, 0, 0, 170)
+QuestionButton.Position = UDim2.new(0.79, 0, 0, 125)
 QuestionButton.BackgroundColor3 = Color3.fromRGB(45, 215, 80)
 QuestionButton.Text = "?"
 QuestionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -106,10 +118,9 @@ local UICorner_Question = Instance.new("UICorner")
 UICorner_Question.CornerRadius = UDim.new(0, 6)
 UICorner_Question.Parent = QuestionButton
 
--- สร้าง UI เมนู Dropdown สำหรับเลือก Mesh
 local ListFrame = Instance.new("Frame")
 ListFrame.Size = UDim2.new(0.9, 0, 0, 100)
-ListFrame.Position = UDim2.new(0.05, 0, 0, 215)
+ListFrame.Position = UDim2.new(0.05, 0, 0, 170)
 ListFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 ListFrame.Visible = false
 ListFrame.ZIndex = 10
@@ -123,19 +134,15 @@ local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Parent = ListFrame
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
--- ข้อมูล Mesh ID 
 local meshes = {
     {name = "crasher", id = "12902786354"},
     {name = "sussy lag mesh v2", id = "8117754198"},
-    {name = "crash mesh v1", id = "9056713385"},
-    {name = "crash mesh v2", id = "106413917745675"},
-    {name = "crash v3", id = "11817552355"}
+    {name = "crash mesh", id = "9056713385"},
+    {name = "crash", id = "11817552355"}
 }
 
--- ตัวแปรเก็บ ID ปัจจุบัน (ค่าเริ่มต้นเป็นตัวแรก)
 local selectedMeshId = meshes[1].id
 
--- สร้างรายชื่อในเมนู Dropdown
 for i, meshData in ipairs(meshes) do
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1, 0, 0, 25)
@@ -149,20 +156,23 @@ for i, meshData in ipairs(meshes) do
     btn.ZIndex = 11
     btn.Parent = ListFrame
 
-    -- เมื่อกดเลือก Mesh
     btn.MouseButton1Click:Connect(function()
         selectedMeshId = meshData.id
-        ListFrame.Visible = false -- ปิดเมนูหลังจากเลือก
+        ListFrame.Visible = false
     end)
 end
 
--- เปิด/ปิด เมนูเมื่อกดปุ่ม ?
+ToggleButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
 QuestionButton.MouseButton1Click:Connect(function()
     ListFrame.Visible = not ListFrame.Visible
 end)
 
 local isSelecting = false
 local isAllSelected = false
+local isApplying = false
 local selectedParts = {}
 
 local function updateLabel()
@@ -186,10 +196,10 @@ end
 SelectButton.MouseButton1Click:Connect(function()
     isSelecting = not isSelecting
     if isSelecting then
-        SelectButton.Text = "เลือกPart (ON)"
+        SelectButton.Text = "Select (ON)"
         SelectButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
     else
-        SelectButton.Text = "เลือกPart (OFF)"
+        SelectButton.Text = "Select (OFF)"
         SelectButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
     end
 end)
@@ -197,7 +207,7 @@ end)
 SelectAllButton.MouseButton1Click:Connect(function()
     isAllSelected = not isAllSelected
     if isAllSelected then
-        SelectAllButton.Text = "ยกเลิกทั้งหมด"
+        SelectAllButton.Text = "None"
         SelectAllButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
 
         for _, obj in pairs(workspace:GetDescendants()) do
@@ -216,7 +226,7 @@ SelectAllButton.MouseButton1Click:Connect(function()
             end
         end
     else
-        SelectAllButton.Text = "เลือกPart ทั้งหมด"
+        SelectAllButton.Text = "All"
         SelectAllButton.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
 
         for part, data in pairs(selectedParts) do
@@ -268,36 +278,55 @@ ApplyButton.MouseButton1Click:Connect(function()
         return
     end
 
-    local ServerEndpoint = btools.SyncAPI.ServerEndpoint
-    local createArgs = {}
-    local syncArgs = {}
+    isApplying = not isApplying
 
-    for part in pairs(selectedParts) do
-        if part and part:IsDescendantOf(workspace) then
-            table.insert(createArgs, { Part = part })
-
-            table.insert(syncArgs, {
-                Part = part,
-                MeshType = Enum.MeshType.FileMesh,
-                -- นำ ID จากตัวแปรที่ถูกเลือกไว้มาใส่ในลิงก์
-                MeshId = "rbxassetid://" .. selectedMeshId,
-                Scale = Vector3.new(1000000, 1000000, 1000000)
-            })
+    if isApplying then
+        ApplyButton.Text = "Apply : ON"
+        ApplyButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        
+        local partsToModify = {}
+        for part in pairs(selectedParts) do
+            if part and part:IsDescendantOf(workspace) then
+                table.insert(partsToModify, part)
+            end
         end
-    end
 
-    if #createArgs > 0 then
-        task.spawn(function()
-            ServerEndpoint:InvokeServer("CreateMeshes", createArgs)
-            ServerEndpoint:InvokeServer("SyncMesh", syncArgs)
-
-            PartNameLabel.Text = "Applied to Server!"
+        if #partsToModify == 0 then
+            isApplying = false
+            ApplyButton.Text = "Apply : OFF"
+            ApplyButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
+            PartNameLabel.Text = "No Part Selected!"
             task.wait(2)
             updateLabel()
+            return
+        end
+
+        task.spawn(function()
+            local ServerEndpoint = btools.SyncAPI.ServerEndpoint
+            
+            while isApplying do
+                local createArgs = {}
+                local syncArgs = {}
+                
+                for _, part in ipairs(partsToModify) do
+                    table.insert(createArgs, { Part = part })
+                    table.insert(syncArgs, {
+                        Part = part,
+                        MeshType = Enum.MeshType.FileMesh,
+                        MeshId = "rbxassetid://" .. selectedMeshId,
+                        Scale = Vector3.new(1000000, 1000000, 1000000)
+                    })
+                end
+
+                ServerEndpoint:InvokeServer("CreateMeshes", createArgs)
+                ServerEndpoint:InvokeServer("SyncMesh", syncArgs)
+                ServerEndpoint:InvokeServer("Clone", partsToModify, workspace)
+                
+                task.wait(0.15)
+            end
         end)
     else
-        PartNameLabel.Text = "No Part Selected!"
-        task.wait(2)
-        updateLabel()
+        ApplyButton.Text = "Apply : OFF"
+        ApplyButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
     end
 end)
