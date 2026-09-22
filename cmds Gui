@@ -1,0 +1,208 @@
+local CoreGui = game:GetService("CoreGui")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TextChatService = game:GetService("TextChatService")
+
+if CoreGui:FindFirstChild("ChatCommandGUI") then
+    CoreGui.ChatCommandGUI:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ChatCommandGUI"
+ScreenGui.Parent = CoreGui
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 45, 0, 45)
+ToggleButton.Position = UDim2.new(0, 20, 0.5, -22)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+ToggleButton.Text = "cmds"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 16
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+ToggleButton.Parent = ScreenGui
+
+local UICorner_Toggle = Instance.new("UICorner")
+UICorner_Toggle.CornerRadius = UDim.new(0, 8)
+UICorner_Toggle.Parent = ToggleButton
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 270, 0, 150)
+MainFrame.Position = UDim2.new(0.5, -135, 0.5, -75)
+MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Text = "Chat Command"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+Title.Parent = MainFrame
+
+local IdInput = Instance.new("TextBox")
+IdInput.Size = UDim2.new(0.9, 0, 0, 35)
+IdInput.Position = UDim2.new(0.05, 0, 0, 45)
+IdInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+IdInput.PlaceholderText = "Enter command (e.g. speed me 50)"
+IdInput.Text = ""
+IdInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+IdInput.Font = Enum.Font.Gotham
+IdInput.TextSize = 14
+IdInput.ClearTextOnFocus = false
+IdInput.Parent = MainFrame
+
+local UICorner_Input = Instance.new("UICorner")
+UICorner_Input.CornerRadius = UDim.new(0, 6)
+UICorner_Input.Parent = IdInput
+
+local RunButton = Instance.new("TextButton")
+RunButton.Size = UDim2.new(0.65, 0, 0, 35)
+RunButton.Position = UDim2.new(0.05, 0, 0, 95)
+RunButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
+RunButton.Text = "Run Command"
+RunButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+RunButton.Font = Enum.Font.GothamBold
+RunButton.TextSize = 14
+RunButton.Parent = MainFrame
+
+local UICorner_Run = Instance.new("UICorner")
+UICorner_Run.CornerRadius = UDim.new(0, 6)
+UICorner_Run.Parent = RunButton
+
+local AutoButton = Instance.new("TextButton")
+AutoButton.Size = UDim2.new(0.22, 0, 0, 35)
+AutoButton.Position = UDim2.new(0.73, 0, 0, 95)
+AutoButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+AutoButton.Text = "Off"
+AutoButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoButton.Font = Enum.Font.GothamBold
+AutoButton.TextSize = 14
+AutoButton.Parent = MainFrame
+
+local UICorner_Auto = Instance.new("UICorner")
+UICorner_Auto.CornerRadius = UDim.new(0, 6)
+UICorner_Auto.Parent = AutoButton
+
+local DelayInput = Instance.new("TextBox")
+DelayInput.Size = UDim2.new(0.22, 0, 0, 30)
+DelayInput.Position = UDim2.new(0.73, 0, 0, 60)
+DelayInput.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+DelayInput.PlaceholderText = "Delay(s)"
+DelayInput.Text = "1"
+DelayInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+DelayInput.Font = Enum.Font.Gotham
+DelayInput.TextSize = 12
+DelayInput.Visible = false
+DelayInput.Parent = MainFrame
+
+local UICorner_Delay = Instance.new("UICorner")
+UICorner_Delay.CornerRadius = UDim.new(0, 6)
+UICorner_Delay.Parent = DelayInput
+
+local bypassCounter = 0
+
+local function sendChatMessage(msg)
+    if msg == "" then return end
+    
+    bypassCounter = (bypassCounter % 5) + 1
+    local spaces = string.rep(" ", bypassCounter)
+    local fullMessage = "/e :" .. msg .. spaces
+
+    pcall(function()
+        if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+            local channel = TextChatService.TextChannels:FindFirstChild("RBXGeneral") or TextChatService.ChatInputBarConfiguration.TargetTextChannel
+            if channel then
+                channel:SendAsync(fullMessage)
+            end
+        else
+            local sayEvent = ReplicatedStorage:FindFirstChild("DefaultChatSystemChatEvents") and ReplicatedStorage.DefaultChatSystemChatEvents:FindFirstChild("SayMessageRequest")
+            if sayEvent then
+                sayEvent:FireServer(fullMessage, "All")
+            end
+        end
+    end)
+end
+
+ToggleButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+RunButton.MouseButton1Click:Connect(function()
+    sendChatMessage(IdInput.Text)
+end)
+
+local isAuto = false
+local currentDelay = 1
+local autoThread = nil
+
+DelayInput.FocusLost:Connect(function()
+    local num = tonumber(DelayInput.Text)
+    if num then
+        currentDelay = math.max(0.1, num)
+    else
+        DelayInput.Text = tostring(currentDelay)
+    end
+    DelayInput.Visible = false
+end)
+
+local function toggleAuto()
+    isAuto = not isAuto
+    if isAuto then
+        AutoButton.Text = "On"
+        AutoButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
+        
+        autoThread = task.spawn(function()
+            while isAuto do
+                local textToSend = IdInput.Text
+                if textToSend ~= "" then
+                    task.spawn(sendChatMessage, textToSend)
+                end
+                task.wait(currentDelay)
+            end
+        end)
+    else
+        AutoButton.Text = "Off"
+        AutoButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        if autoThread then
+            task.cancel(autoThread)
+            autoThread = nil
+        end
+    end
+end
+
+local isHolding = false
+local holdTick = 0
+
+AutoButton.MouseButton1Down:Connect(function()
+    isHolding = true
+    holdTick = tick()
+    
+    task.spawn(function()
+        task.wait(0.5)
+        if isHolding then
+            DelayInput.Visible = true
+            DelayInput:CaptureFocus()
+        end
+    end)
+end)
+
+AutoButton.MouseButton1Up:Connect(function()
+    if not isHolding then return end
+    isHolding = false
+    
+    if tick() - holdTick < 0.5 and not DelayInput.Visible then
+        toggleAuto()
+    end
+end)
+
+AutoButton.MouseLeave:Connect(function()
+    isHolding = false
+end)
