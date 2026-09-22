@@ -12,7 +12,7 @@ ScreenGui.Parent = CoreGui
 
 local ToggleButton = Instance.new("TextButton")
 ToggleButton.Size = UDim2.new(0, 45, 0, 45)
-ToggleButton.Position = UDim2.new(0, 20, 0.5, -22)
+ToggleButton.Position = UDim2.new(0, 20, 0.5, 26)
 ToggleButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 ToggleButton.Text = "cmds"
 ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
