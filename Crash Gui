@@ -31,8 +31,42 @@ MainFrame.Size = UDim2.new(0, 270, 0, 175)
 MainFrame.Position = UDim2.new(0.5, -135, 0.5, -87)
 MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 MainFrame.Active = true
-MainFrame.Draggable = true
 MainFrame.Parent = ScreenGui
+
+-- ระบบ Dragging ลาก Frame แบบลื่นไหลด้วย UserInputService
+local dragging = false
+local dragInput, dragStart, startPos
+
+local function updateDrag(input)
+    local delta = input.Position - dragStart
+    MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+MainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        updateDrag(input)
+    end
+end)
 
 local UICorner = Instance.new("UICorner")
 UICorner.CornerRadius = UDim.new(0, 8)
@@ -284,7 +318,7 @@ ApplyButton.MouseButton1Click:Connect(function()
     if isApplying then
         ApplyButton.Text = "Apply : ON"
         ApplyButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-        
+
         local partsToModify = {}
         for part in pairs(selectedParts) do
             if part and part:IsDescendantOf(workspace) then
@@ -304,11 +338,11 @@ ApplyButton.MouseButton1Click:Connect(function()
 
         task.spawn(function()
             local ServerEndpoint = btools.SyncAPI.ServerEndpoint
-            
+
             while isApplying do
                 local createArgs = {}
                 local syncArgs = {}
-                
+
                 for _, part in ipairs(partsToModify) do
                     table.insert(createArgs, { Part = part })
                     table.insert(syncArgs, {
@@ -322,7 +356,7 @@ ApplyButton.MouseButton1Click:Connect(function()
                 ServerEndpoint:InvokeServer("CreateMeshes", createArgs)
                 ServerEndpoint:InvokeServer("SyncMesh", syncArgs)
                 ServerEndpoint:InvokeServer("Clone", partsToModify, workspace)
-                
+
                 task.wait(0.15)
             end
         end)
