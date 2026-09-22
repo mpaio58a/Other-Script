@@ -19,7 +19,7 @@ ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleButton.Font = Enum.Font.GothamBold
 ToggleButton.TextSize = 16
 ToggleButton.Active = true
-ToggleButton.Draggable = true
+ToggleButton.Draggable = false
 ToggleButton.Parent = ScreenGui
 
 local UICorner_Toggle = Instance.new("UICorner")
@@ -31,7 +31,7 @@ MainFrame.Size = UDim2.new(0, 270, 0, 150)
 MainFrame.Position = UDim2.new(0.5, -135, 0.5, 26)
 MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 MainFrame.Active = true
-MainFrame.Draggable = true
+MainFrame.Draggable = false
 MainFrame.Parent = ScreenGui
 
 local UICorner = Instance.new("UICorner")
