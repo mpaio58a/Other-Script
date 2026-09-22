@@ -1,6 +1,7 @@
 local CoreGui = game:GetService("CoreGui")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TextChatService = game:GetService("TextChatService")
+local UserInputService = game:GetService("UserInputService")
 
 if CoreGui:FindFirstChild("ChatCommandGUI") then
     CoreGui.ChatCommandGUI:Destroy()
@@ -27,11 +28,45 @@ UICorner_Toggle.Parent = ToggleButton
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 270, 0, 150)
-MainFrame.Position = UDim2.new(0.5, -135, 0.5, -71)
+MainFrame.Position = UDim2.new(0.5, -135, 0.5, -87)
 MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 MainFrame.Active = true
-MainFrame.Draggable = true
 MainFrame.Parent = ScreenGui
+
+-- Smooth Dragging System
+local dragging = false
+local dragInput, dragStart, startPos
+
+local function updateDrag(input)
+    local delta = input.Position - dragStart
+    MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+MainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        updateDrag(input)
+    end
+end)
 
 local UICorner = Instance.new("UICorner")
 UICorner.CornerRadius = UDim.new(0, 8)
@@ -110,7 +145,7 @@ local bypassCounter = 0
 
 local function sendChatMessage(msg)
     if msg == "" then return end
-    
+
     bypassCounter = (bypassCounter % 5) + 1
     local spaces = string.rep(" ", bypassCounter)
     local fullMessage = "/e :" .. msg .. spaces
@@ -157,7 +192,7 @@ local function toggleAuto()
     if isAuto then
         AutoButton.Text = "On"
         AutoButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
-        
+
         autoThread = task.spawn(function()
             while isAuto do
                 local textToSend = IdInput.Text
@@ -183,7 +218,7 @@ local holdTick = 0
 AutoButton.MouseButton1Down:Connect(function()
     isHolding = true
     holdTick = tick()
-    
+
     task.spawn(function()
         task.wait(0.5)
         if isHolding then
@@ -196,7 +231,7 @@ end)
 AutoButton.MouseButton1Up:Connect(function()
     if not isHolding then return end
     isHolding = false
-    
+
     if tick() - holdTick < 0.5 and not DelayInput.Visible then
         toggleAuto()
     end
