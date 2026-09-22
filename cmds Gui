@@ -148,7 +148,7 @@ local function sendChatMessage(msg)
 
     bypassCounter = (bypassCounter % 5) + 1
     local spaces = string.rep(" ", bypassCounter)
-    local fullMessage = "/e :" .. msg .. spaces
+    local fullMessage = "/e " .. msg .. spaces
 
     pcall(function()
         if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
