@@ -28,7 +28,7 @@ UICorner_Toggle.Parent = ToggleButton
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 270, 0, 150)
-MainFrame.Position = UDim2.new(0.5, -135, 0.5, -75)
+MainFrame.Position = UDim2.new(0.5, -135, 0.5, -71)
 MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 MainFrame.Active = true
 MainFrame.Draggable = true
