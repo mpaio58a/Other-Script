@@ -27,13 +27,12 @@ UICorner_Toggle.CornerRadius = UDim.new(0, 8)
 UICorner_Toggle.Parent = ToggleButton
 
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 270, 0, 175)
-MainFrame.Position = UDim2.new(0.5, -135, 0.5, -87)
+MainFrame.Size = UDim2.new(0, 270, 0, 265)
+MainFrame.Position = UDim2.new(0.5, -135, 0.5, -132)
 MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 MainFrame.Active = true
 MainFrame.Parent = ScreenGui
 
--- ระบบ Dragging ลาก Frame แบบลื่นไหลด้วย UserInputService
 local dragging = false
 local dragInput, dragStart, startPos
 
@@ -152,9 +151,52 @@ local UICorner_Question = Instance.new("UICorner")
 UICorner_Question.CornerRadius = UDim.new(0, 6)
 UICorner_Question.Parent = QuestionButton
 
+local AmountBox = Instance.new("TextBox")
+AmountBox.Size = UDim2.new(0.25, 0, 0, 35)
+AmountBox.Position = UDim2.new(0.05, 0, 0, 170)
+AmountBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+AmountBox.Text = "1"
+AmountBox.PlaceholderText = "Amt"
+AmountBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+AmountBox.Font = Enum.Font.GothamBold
+AmountBox.TextSize = 14
+AmountBox.Parent = MainFrame
+
+local UICorner_Amount = Instance.new("UICorner")
+UICorner_Amount.CornerRadius = UDim.new(0, 6)
+UICorner_Amount.Parent = AmountBox
+
+local CopyButton = Instance.new("TextButton")
+CopyButton.Size = UDim2.new(0.62, 0, 0, 35)
+CopyButton.Position = UDim2.new(0.33, 0, 0, 170)
+CopyButton.BackgroundColor3 = Color3.fromRGB(150, 50, 200)
+CopyButton.Text = "Copy & Select"
+CopyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CopyButton.Font = Enum.Font.GothamBold
+CopyButton.TextSize = 14
+CopyButton.Parent = MainFrame
+
+local UICorner_Copy = Instance.new("UICorner")
+UICorner_Copy.CornerRadius = UDim.new(0, 6)
+UICorner_Copy.Parent = CopyButton
+
+local UnanchorButton = Instance.new("TextButton")
+UnanchorButton.Size = UDim2.new(0.9, 0, 0, 35)
+UnanchorButton.Position = UDim2.new(0.05, 0, 0, 215)
+UnanchorButton.BackgroundColor3 = Color3.fromRGB(200, 100, 30)
+UnanchorButton.Text = "Unanchored"
+UnanchorButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+UnanchorButton.Font = Enum.Font.GothamBold
+UnanchorButton.TextSize = 14
+UnanchorButton.Parent = MainFrame
+
+local UICorner_Unanchor = Instance.new("UICorner")
+UICorner_Unanchor.CornerRadius = UDim.new(0, 6)
+UICorner_Unanchor.Parent = UnanchorButton
+
 local ListFrame = Instance.new("Frame")
 ListFrame.Size = UDim2.new(0.9, 0, 0, 100)
-ListFrame.Position = UDim2.new(0.05, 0, 0, 170)
+ListFrame.Position = UDim2.new(0.05, 0, 0, 270)
 ListFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 ListFrame.Visible = false
 ListFrame.ZIndex = 10
@@ -226,6 +268,21 @@ local function updateLabel()
     else
         PartNameLabel.Text = "Part: None"
     end
+end
+
+local function getBTools()
+    local backpack = player:FindFirstChild("Backpack")
+    local character = player.Character
+    local btools = (character and character:FindFirstChild("Building Tools")) or (backpack and backpack:FindFirstChild("Building Tools"))
+    if btools and btools:FindFirstChild("SyncAPI") and btools.SyncAPI:FindFirstChild("ServerEndpoint") then
+        return btools
+    end
+    PartNameLabel.Text = "Please equip 'Building Tools'"
+    task.spawn(function()
+        task.wait(2)
+        updateLabel()
+    end)
+    return nil
 end
 
 SelectButton.MouseButton1Click:Connect(function()
@@ -301,17 +358,103 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
-ApplyButton.MouseButton1Click:Connect(function()
-    local backpack = player:FindFirstChild("Backpack")
-    local character = player.Character
-    local btools = (character and character:FindFirstChild("Building Tools")) or (backpack and backpack:FindFirstChild("Building Tools"))
+CopyButton.MouseButton1Click:Connect(function()
+    local btools = getBTools()
+    if not btools then return end
 
-    if not btools or not btools:FindFirstChild("SyncAPI") or not btools.SyncAPI:FindFirstChild("ServerEndpoint") then
-        PartNameLabel.Text = "Please equip 'Building Tools'"
-        task.wait(2)
-        updateLabel()
+    local targetAmount = tonumber(AmountBox.Text) or 1
+    if targetAmount <= 0 then return end
+
+    local ServerEndpoint = btools.SyncAPI.ServerEndpoint
+    local originalParts = {}
+
+    for part in pairs(selectedParts) do
+        if part and part:IsDescendantOf(workspace) then
+            table.insert(originalParts, part)
+        end
+    end
+
+    if #originalParts == 0 then
+        PartNameLabel.Text = "No Part Selected!"
+        task.delay(2, updateLabel)
         return
     end
+
+    CopyButton.Text = "Copying..."
+    AmountBox.Text = "0/" .. targetAmount
+
+    for i = 1, targetAmount do
+        local newClones = {}
+
+        -- ดักจับชิ้นส่วนที่ถูกสร้างขึ้นมาใหม่ในเซิร์ฟเวอร์
+        local connection = workspace.DescendantAdded:Connect(function(descendant)
+            if descendant:IsA("BasePart") then
+                -- ตรวจสอบว่าเป็นพาร์ทที่ถูกโคลนมาจริงๆ (เช็คจากชื่อและขนาด) เพื่อกันไปโดนพาร์ทของคนอื่น
+                for _, orig in ipairs(originalParts) do
+                    if descendant.Name == orig.Name and descendant.Size == orig.Size then
+                        table.insert(newClones, descendant)
+                        break
+                    end
+                end
+            end
+        end)
+
+        -- ส่งคำสั่ง Clone
+        ServerEndpoint:InvokeServer("Clone", originalParts, workspace)
+
+        -- รอเวลาให้เซิร์ฟเวอร์ทำการโคลนและโหลดลง Client ให้เสร็จ (ปรับเวลาได้ถ้าเน็ตช้า)
+        task.wait(0.25)
+        connection:Disconnect() -- ปิดการดักจับ
+
+        -- นำชิ้นส่วนใหม่มาใส่ Highlight และเพิ่มเข้าไปใน List ที่เลือกไว้
+        for _, newPart in ipairs(newClones) do
+            if not selectedParts[newPart] then
+                local highlight = Instance.new("Highlight")
+                highlight.Name = "SelectionOutline"
+                highlight.Adornee = newPart
+                highlight.FillTransparency = 1
+                highlight.OutlineColor = Color3.fromRGB(0, 170, 255)
+                highlight.OutlineTransparency = 0
+                highlight.Parent = newPart
+
+                selectedParts[newPart] = { Highlight = highlight }
+            end
+        end
+
+        AmountBox.Text = i .. "/" .. targetAmount
+    end
+
+    CopyButton.Text = "Copy & Select"
+    AmountBox.Text = tostring(targetAmount)
+    updateLabel()
+end)
+
+UnanchorButton.MouseButton1Click:Connect(function()
+    local btools = getBTools()
+    if not btools then return end
+
+    local ServerEndpoint = btools.SyncAPI.ServerEndpoint
+    local syncArgs = {}
+
+    for part in pairs(selectedParts) do
+        if part and part:IsDescendantOf(workspace) then
+            table.insert(syncArgs, {
+                Part = part,
+                Anchored = false
+            })
+        end
+    end
+
+    if #syncArgs > 0 then
+        ServerEndpoint:InvokeServer("SyncAnchor", syncArgs)
+        PartNameLabel.Text = "Unanchored " .. #syncArgs .. " parts!"
+        task.delay(2, updateLabel)
+    end
+end)
+
+ApplyButton.MouseButton1Click:Connect(function()
+    local btools = getBTools()
+    if not btools then return end
 
     isApplying = not isApplying
 
@@ -355,7 +498,6 @@ ApplyButton.MouseButton1Click:Connect(function()
 
                 ServerEndpoint:InvokeServer("CreateMeshes", createArgs)
                 ServerEndpoint:InvokeServer("SyncMesh", syncArgs)
-                ServerEndpoint:InvokeServer("Clone", partsToModify, workspace)
 
                 task.wait(0.15)
             end
