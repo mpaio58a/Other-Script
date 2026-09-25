@@ -1,87 +1,99 @@
 local Workspace = game:GetService("Workspace")
 
-local MAX_LIMIT = Vector3.new(0, 0, 0)
-local MAX_ALLOWED_MAGNITUDE = MAX_LIMIT.Magnitude 
-local BATCH_SIZE = 150 -- จำนวนชิ้นที่จะประมวลผลก่อนพัก 1 เฟรม (ปรับลดได้ถ้ายังกระตุก)
+local MAX_ALLOWED_MAGNITUDE = 100000 
+local BATCH_SIZE = 150 
 
-local function neutralizeSpecialMesh(specialMesh)
-	if not specialMesh or not specialMesh:IsA("SpecialMesh") then return end
-	if specialMesh:GetAttribute("ClientProtected") then return end 
+local BLACKLISTED_MESH_IDS = {
+	["12902786354"] = true,
+	["8117754198"] = true,
+	["9056713385"] = true,
+	["106413917745675"] = true,
+	["11817552355"] = true
+}
 
-	if specialMesh.Scale.Magnitude > MAX_ALLOWED_MAGNITUDE then
-		specialMesh:SetAttribute("ClientProtected", true)
-		specialMesh.Scale = Vector3.new(0, 0, 0)
-
-		local parent = specialMesh.Parent
-		if parent and parent:IsA("BasePart") then
-			parent.Transparency = 1
-			parent.CastShadow = false
-			parent.CanCollide = false
-			parent.CanQuery = false
-			parent.CanTouch = false
-			parent.Massless = true
-		end
-	end
+local function extractId(meshId)
+	if not meshId or meshId == "" then return nil end
+	return string.match(meshId, "%d+") 
 end
 
-local function neutralizeMeshPart(meshPart)
-	if not meshPart or not meshPart:IsA("MeshPart") then return end
-	if meshPart:GetAttribute("ClientProtected") then return end
+local function isAbnormalVector(vec3)
+	if vec3.X ~= vec3.X or vec3.Y ~= vec3.Y or vec3.Z ~= vec3.Z then return true end
+	if vec3.X == math.huge or vec3.Y == math.huge or vec3.Z == math.huge then return true end
+	if vec3.X == -math.huge or vec3.Y == -math.huge or vec3.Z == -math.huge then return true end
+	if vec3.Magnitude > MAX_ALLOWED_MAGNITUDE then return true end
+	return false
+end
 
-	if meshPart.Size.Magnitude > MAX_ALLOWED_MAGNITUDE then
-		meshPart:SetAttribute("ClientProtected", true)
+local function isMalicious(inst)
+	if inst:IsA("SpecialMesh") or inst:IsA("MeshPart") then
+		local id = extractId(inst.MeshId)
+		if id and BLACKLISTED_MESH_IDS[id] then
+			return true
+		end
+	end
+	
+	if inst:IsA("SpecialMesh") then
+		if isAbnormalVector(inst.Scale) or isAbnormalVector(inst.Offset) or isAbnormalVector(inst.VertexColor) then
+			return true
+		end
+	elseif inst:IsA("MeshPart") then
+		if isAbnormalVector(inst.Size) then
+			return true
+		end
+	end
+	
+	return false
+end
 
-		meshPart.Transparency = 1
-		meshPart.CastShadow = false
-		meshPart.CanCollide = false
-		meshPart.CanQuery = false
-		meshPart.CanTouch = false
-		meshPart.Massless = true
+local function neutralize(inst)
+	if inst:GetAttribute("ClientProtected") then return end
+	inst:SetAttribute("ClientProtected", true)
+	
+	if inst:IsA("SpecialMesh") then
+		local parent = inst.Parent
+		if parent and parent:IsA("BasePart") then
+			parent:Destroy() 
+		else
+			inst:Destroy()
+		end
+	elseif inst:IsA("MeshPart") then
+		inst:Destroy()
 	end
 end
 
 local function processInstance(inst)
-	if inst:IsA("SpecialMesh") then
-		neutralizeSpecialMesh(inst)
-	elseif inst:IsA("MeshPart") then
-		neutralizeMeshPart(inst)
+	if inst:IsA("SpecialMesh") or inst:IsA("MeshPart") then
+		if isMalicious(inst) then
+			neutralize(inst)
+			return
+		end
+		
+		inst:GetPropertyChangedSignal("MeshId"):Connect(function()
+			if isMalicious(inst) then neutralize(inst) end
+		end)
+		
+		if inst:IsA("SpecialMesh") then
+			inst:GetPropertyChangedSignal("Scale"):Connect(function()
+				if isMalicious(inst) then neutralize(inst) end
+			end)
+		elseif inst:IsA("MeshPart") then
+			inst:GetPropertyChangedSignal("Size"):Connect(function()
+				if isMalicious(inst) then neutralize(inst) end
+			end)
+		end
 	end
 end
 
--- ฟังก์ชันสแกน Workspace ทั้งหมดแบบไม่ทำให้เกมค้าง
-local function scanWorkspace()
+task.spawn(function()
 	local descendants = Workspace:GetDescendants()
 	for i, descendant in ipairs(descendants) do
 		processInstance(descendant)
-		
-		-- เมื่อประมวลผลครบตาม BATCH_SIZE ให้พักการทำงาน 1 เฟรม (กันค้าง)
 		if i % BATCH_SIZE == 0 then
 			task.wait()
 		end
 	end
-end
-
--- ดักจับเมื่อมีชิ้นส่วนใหม่ถูกสร้างเข้ามาใน Workspace
-Workspace.DescendantAdded:Connect(function(descendant)
-	task.defer(function()
-		processInstance(descendant)
-
-		if descendant:IsA("SpecialMesh") then
-			descendant:GetPropertyChangedSignal("Scale"):Connect(function()
-				neutralizeSpecialMesh(descendant)
-			end)
-		elseif descendant:IsA("MeshPart") then
-			descendant:GetPropertyChangedSignal("Size"):Connect(function()
-				neutralizeMeshPart(descendant)
-			end)
-		end
-	end)
 end)
 
--- สร้าง Loop ตรวจสอบตลอดเวลาแบบปลอดภัย 
-task.spawn(function()
-	while true do
-		scanWorkspace() -- สแกนทั้งหมด (ฟังก์ชันนี้มีการเว้นจังหวะ task.wait() ในตัวอยู่แล้ว)
-		task.wait(5) -- เมื่อสแกนเสร็จ ให้รออีก 5 วินาทีแล้วค่อยเริ่มรอบใหม่ (ลดภาระเซิร์ฟเวอร์/เครื่องลูกค้า)
-	end
+Workspace.DescendantAdded:Connect(function(descendant)
+	task.defer(processInstance, descendant)
 end)
