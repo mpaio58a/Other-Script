@@ -1,0 +1,509 @@
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+if CoreGui:FindFirstChild("MeshModifierGUI") then
+    CoreGui.MeshModifierGUI:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MeshModifierGUI"
+ScreenGui.Parent = CoreGui
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 45, 0, 45)
+ToggleButton.Position = UDim2.new(0, 0, 0.5, -22)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+ToggleButton.Text = "UI"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.TextSize = 16
+ToggleButton.Parent = ScreenGui
+
+local UICorner_Toggle = Instance.new("UICorner")
+UICorner_Toggle.CornerRadius = UDim.new(0, 8)
+UICorner_Toggle.Parent = ToggleButton
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 270, 0, 265)
+MainFrame.Position = UDim2.new(0.5, -135, 0.5, -132)
+MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+MainFrame.Active = true
+MainFrame.Parent = ScreenGui
+
+local dragging = false
+local dragInput, dragStart, startPos
+
+local function updateDrag(input)
+    local delta = input.Position - dragStart
+    MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+MainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        updateDrag(input)
+    end
+end)
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Text = "Mesh Tool"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+Title.Parent = MainFrame
+
+local PartNameLabel = Instance.new("TextLabel")
+PartNameLabel.Size = UDim2.new(0.9, 0, 0, 30)
+PartNameLabel.Position = UDim2.new(0.05, 0, 0, 40)
+PartNameLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+PartNameLabel.Text = "Part: None"
+PartNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+PartNameLabel.Font = Enum.Font.Gotham
+PartNameLabel.TextSize = 13
+PartNameLabel.TextScaled = true
+PartNameLabel.Parent = MainFrame
+
+local UICorner_Label = Instance.new("UICorner")
+UICorner_Label.CornerRadius = UDim.new(0, 6)
+UICorner_Label.Parent = PartNameLabel
+
+local SelectButton = Instance.new("TextButton")
+SelectButton.Size = UDim2.new(0.72, 0, 0, 35)
+SelectButton.Position = UDim2.new(0.05, 0, 0, 80)
+SelectButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+SelectButton.Text = "Select : OFF"
+SelectButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SelectButton.Font = Enum.Font.GothamBold
+SelectButton.TextSize = 14
+SelectButton.Parent = MainFrame
+
+local UICorner_Select = Instance.new("UICorner")
+UICorner_Select.CornerRadius = UDim.new(0, 6)
+UICorner_Select.Parent = SelectButton
+
+local SelectAllButton = Instance.new("TextButton")
+SelectAllButton.Size = UDim2.new(0.16, 0, 0, 35)
+SelectAllButton.Position = UDim2.new(0.79, 0, 0, 80)
+SelectAllButton.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+SelectAllButton.Text = "All"
+SelectAllButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SelectAllButton.Font = Enum.Font.GothamBold
+SelectAllButton.TextSize = 13
+SelectAllButton.Parent = MainFrame
+
+local UICorner_SelectAll = Instance.new("UICorner")
+UICorner_SelectAll.CornerRadius = UDim.new(0, 6)
+UICorner_SelectAll.Parent = SelectAllButton
+
+local ApplyButton = Instance.new("TextButton")
+ApplyButton.Size = UDim2.new(0.72, 0, 0, 35)
+ApplyButton.Position = UDim2.new(0.05, 0, 0, 125)
+ApplyButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
+ApplyButton.Text = "Apply : OFF"
+ApplyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ApplyButton.Font = Enum.Font.GothamBold
+ApplyButton.TextSize = 14
+ApplyButton.Parent = MainFrame
+
+local UICorner_Apply = Instance.new("UICorner")
+UICorner_Apply.CornerRadius = UDim.new(0, 6)
+UICorner_Apply.Parent = ApplyButton
+
+local QuestionButton = Instance.new("TextButton")
+QuestionButton.Size = UDim2.new(0.16, 0, 0, 35)
+QuestionButton.Position = UDim2.new(0.79, 0, 0, 125)
+QuestionButton.BackgroundColor3 = Color3.fromRGB(45, 215, 80)
+QuestionButton.Text = "?"
+QuestionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+QuestionButton.Font = Enum.Font.GothamBold
+QuestionButton.TextSize = 24
+QuestionButton.Parent = MainFrame
+
+local UICorner_Question = Instance.new("UICorner")
+UICorner_Question.CornerRadius = UDim.new(0, 6)
+UICorner_Question.Parent = QuestionButton
+
+local AmountBox = Instance.new("TextBox")
+AmountBox.Size = UDim2.new(0.25, 0, 0, 35)
+AmountBox.Position = UDim2.new(0.05, 0, 0, 170)
+AmountBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+AmountBox.Text = "1"
+AmountBox.PlaceholderText = "Amt"
+AmountBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+AmountBox.Font = Enum.Font.GothamBold
+AmountBox.TextSize = 14
+AmountBox.Parent = MainFrame
+
+local UICorner_Amount = Instance.new("UICorner")
+UICorner_Amount.CornerRadius = UDim.new(0, 6)
+UICorner_Amount.Parent = AmountBox
+
+local CopyButton = Instance.new("TextButton")
+CopyButton.Size = UDim2.new(0.62, 0, 0, 35)
+CopyButton.Position = UDim2.new(0.33, 0, 0, 170)
+CopyButton.BackgroundColor3 = Color3.fromRGB(150, 50, 200)
+CopyButton.Text = "Copy & Select"
+CopyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CopyButton.Font = Enum.Font.GothamBold
+CopyButton.TextSize = 14
+CopyButton.Parent = MainFrame
+
+local UICorner_Copy = Instance.new("UICorner")
+UICorner_Copy.CornerRadius = UDim.new(0, 6)
+UICorner_Copy.Parent = CopyButton
+
+local UnanchorButton = Instance.new("TextButton")
+UnanchorButton.Size = UDim2.new(0.9, 0, 0, 35)
+UnanchorButton.Position = UDim2.new(0.05, 0, 0, 215)
+UnanchorButton.BackgroundColor3 = Color3.fromRGB(200, 100, 30)
+UnanchorButton.Text = "Unanchored"
+UnanchorButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+UnanchorButton.Font = Enum.Font.GothamBold
+UnanchorButton.TextSize = 14
+UnanchorButton.Parent = MainFrame
+
+local UICorner_Unanchor = Instance.new("UICorner")
+UICorner_Unanchor.CornerRadius = UDim.new(0, 6)
+UICorner_Unanchor.Parent = UnanchorButton
+
+local ListFrame = Instance.new("Frame")
+ListFrame.Size = UDim2.new(0.9, 0, 0, 100)
+ListFrame.Position = UDim2.new(0.05, 0, 0, 270)
+ListFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+ListFrame.Visible = false
+ListFrame.ZIndex = 10
+ListFrame.Parent = MainFrame
+
+local UICorner_List = Instance.new("UICorner")
+UICorner_List.CornerRadius = UDim.new(0, 6)
+UICorner_List.Parent = ListFrame
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = ListFrame
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local meshes = {
+    {name = "crasher", id = "12902786354"},
+    {name = "sussy lag mesh v2", id = "8117754198"},
+    {name = "crash mesh v1", id = "9056713385"},
+    {name = "crash mesh v2", id = "106413917745675"},
+    {name = "crash mesh v3", id = "11817552355"}
+}
+
+local selectedMeshId = meshes[1].id
+
+for i, meshData in ipairs(meshes) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 25)
+    btn.BackgroundColor3 = (i % 2 == 0) and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(55, 55, 55)
+    btn.BorderSizePixel = 0
+    btn.Text = "  " .. meshData.name
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 13
+    btn.ZIndex = 11
+    btn.Parent = ListFrame
+
+    btn.MouseButton1Click:Connect(function()
+        selectedMeshId = meshData.id
+        ListFrame.Visible = false
+    end)
+end
+
+ToggleButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+QuestionButton.MouseButton1Click:Connect(function()
+    ListFrame.Visible = not ListFrame.Visible
+end)
+
+local isSelecting = false
+local isAllSelected = false
+local isApplying = false
+local selectedParts = {}
+
+local function updateLabel()
+    local count = 0
+    local lastPartName = ""
+
+    for part in pairs(selectedParts) do
+        count = count + 1
+        lastPartName = part.Name
+    end
+
+    if count == 1 then
+        PartNameLabel.Text = "Part: " .. lastPartName
+    elseif count > 1 then
+        PartNameLabel.Text = "Part: Selected (" .. tostring(count) .. ")"
+    else
+        PartNameLabel.Text = "Part: None"
+    end
+end
+
+local function getBTools()
+    local backpack = player:FindFirstChild("Backpack")
+    local character = player.Character
+    local btools = (character and character:FindFirstChild("Building Tools")) or (backpack and backpack:FindFirstChild("Building Tools"))
+    if btools and btools:FindFirstChild("SyncAPI") and btools.SyncAPI:FindFirstChild("ServerEndpoint") then
+        return btools
+    end
+    PartNameLabel.Text = "Please equip 'Building Tools'"
+    task.spawn(function()
+        task.wait(2)
+        updateLabel()
+    end)
+    return nil
+end
+
+SelectButton.MouseButton1Click:Connect(function()
+    isSelecting = not isSelecting
+    if isSelecting then
+        SelectButton.Text = "Select : ON"
+        SelectButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    else
+        SelectButton.Text = "Select : OFF"
+        SelectButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    end
+end)
+
+SelectAllButton.MouseButton1Click:Connect(function()
+    isAllSelected = not isAllSelected
+    if isAllSelected then
+        SelectAllButton.Text = "None"
+        SelectAllButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") and not obj:IsA("Terrain") then
+                if not selectedParts[obj] then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Name = "SelectionOutline"
+                    highlight.Adornee = obj
+                    highlight.FillTransparency = 1
+                    highlight.OutlineColor = Color3.fromRGB(0, 170, 255)
+                    highlight.OutlineTransparency = 0
+                    highlight.Parent = obj
+
+                    selectedParts[obj] = { Highlight = highlight }
+                end
+            end
+        end
+    else
+        SelectAllButton.Text = "All"
+        SelectAllButton.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+
+        for part, data in pairs(selectedParts) do
+            if data.Highlight then
+                data.Highlight:Destroy()
+            end
+        end
+        table.clear(selectedParts)
+    end
+    updateLabel()
+end)
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed or not isSelecting then return end
+
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        local target = mouse.Target
+        if target and target:IsA("BasePart") then
+            if selectedParts[target] then
+                if selectedParts[target].Highlight then
+                    selectedParts[target].Highlight:Destroy()
+                end
+                selectedParts[target] = nil
+            else
+                local highlight = Instance.new("Highlight")
+                highlight.Name = "SelectionOutline"
+                highlight.Adornee = target
+                highlight.FillTransparency = 1
+                highlight.OutlineColor = Color3.fromRGB(0, 170, 255)
+                highlight.OutlineTransparency = 0
+                highlight.Parent = target
+
+                selectedParts[target] = { Highlight = highlight }
+            end
+            updateLabel()
+        end
+    end
+end)
+
+CopyButton.MouseButton1Click:Connect(function()
+    local btools = getBTools()
+    if not btools then return end
+
+    local targetAmount = tonumber(AmountBox.Text) or 1
+    if targetAmount <= 0 then return end
+    
+    local ServerEndpoint = btools.SyncAPI.ServerEndpoint
+    local originalParts = {}
+    
+    for part in pairs(selectedParts) do
+        if part and part:IsDescendantOf(workspace) then
+            table.insert(originalParts, part)
+        end
+    end
+
+    if #originalParts == 0 then
+        PartNameLabel.Text = "No Part Selected!"
+        task.delay(2, updateLabel)
+        return
+    end
+
+    CopyButton.Text = "Copying..."
+    AmountBox.Text = "0/" .. targetAmount
+    
+    for i = 1, targetAmount do
+        local newClones = {}
+        
+        -- ดักจับชิ้นส่วนที่ถูกสร้างขึ้นมาใหม่ในเซิร์ฟเวอร์
+        local connection = workspace.DescendantAdded:Connect(function(descendant)
+            if descendant:IsA("BasePart") then
+                -- ตรวจสอบว่าเป็นพาร์ทที่ถูกโคลนมาจริงๆ (เช็คจากชื่อและขนาด) เพื่อกันไปโดนพาร์ทของคนอื่น
+                for _, orig in ipairs(originalParts) do
+                    if descendant.Name == orig.Name and descendant.Size == orig.Size then
+                        table.insert(newClones, descendant)
+                        break
+                    end
+                end
+            end
+        end)
+
+        -- ส่งคำสั่ง Clone
+        ServerEndpoint:InvokeServer("Clone", originalParts, workspace)
+        
+        -- รอเวลาให้เซิร์ฟเวอร์ทำการโคลนและโหลดลง Client ให้เสร็จ (ปรับเวลาได้ถ้าเน็ตช้า)
+        task.wait(0.25)
+        connection:Disconnect() -- ปิดการดักจับ
+        
+        -- นำชิ้นส่วนใหม่มาใส่ Highlight และเพิ่มเข้าไปใน List ที่เลือกไว้
+        for _, newPart in ipairs(newClones) do
+            if not selectedParts[newPart] then
+                local highlight = Instance.new("Highlight")
+                highlight.Name = "SelectionOutline"
+                highlight.Adornee = newPart
+                highlight.FillTransparency = 1
+                highlight.OutlineColor = Color3.fromRGB(0, 170, 255)
+                highlight.OutlineTransparency = 0
+                highlight.Parent = newPart
+
+                selectedParts[newPart] = { Highlight = highlight }
+            end
+        end
+        
+        AmountBox.Text = i .. "/" .. targetAmount
+    end
+    
+    CopyButton.Text = "Copy & Select"
+    AmountBox.Text = tostring(targetAmount)
+    updateLabel()
+end)
+
+UnanchorButton.MouseButton1Click:Connect(function()
+    local btools = getBTools()
+    if not btools then return end
+
+    local ServerEndpoint = btools.SyncAPI.ServerEndpoint
+    local syncArgs = {}
+
+    for part in pairs(selectedParts) do
+        if part and part:IsDescendantOf(workspace) then
+            table.insert(syncArgs, {
+                Part = part,
+                Anchored = false
+            })
+        end
+    end
+
+    if #syncArgs > 0 then
+        ServerEndpoint:InvokeServer("SyncAnchor", syncArgs)
+        PartNameLabel.Text = "Unanchored " .. #syncArgs .. " parts!"
+        task.delay(2, updateLabel)
+    end
+end)
+
+ApplyButton.MouseButton1Click:Connect(function()
+    local btools = getBTools()
+    if not btools then return end
+
+    isApplying = not isApplying
+
+    if isApplying then
+        ApplyButton.Text = "Apply : ON"
+        ApplyButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+
+        local partsToModify = {}
+        for part in pairs(selectedParts) do
+            if part and part:IsDescendantOf(workspace) then
+                table.insert(partsToModify, part)
+            end
+        end
+
+        if #partsToModify == 0 then
+            isApplying = false
+            ApplyButton.Text = "Apply : OFF"
+            ApplyButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
+            PartNameLabel.Text = "No Part Selected!"
+            task.wait(2)
+            updateLabel()
+            return
+        end
+
+        task.spawn(function()
+            local ServerEndpoint = btools.SyncAPI.ServerEndpoint
+
+            while isApplying do
+                local createArgs = {}
+                local syncArgs = {}
+
+                for _, part in ipairs(partsToModify) do
+                    table.insert(createArgs, { Part = part })
+                    table.insert(syncArgs, {
+                        Part = part,
+                        MeshType = Enum.MeshType.FileMesh,
+                        MeshId = "rbxassetid://" .. selectedMeshId,
+                        Scale = Vector3.new(1000000, 1000000, 1000000)
+                    })
+                end
+
+                ServerEndpoint:InvokeServer("CreateMeshes", createArgs)
+                ServerEndpoint:InvokeServer("SyncMesh", syncArgs)
+
+                task.wait(0.15)
+            end
+        end)
+    else
+        ApplyButton.Text = "Apply : OFF"
+        ApplyButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
+    end
+end)
