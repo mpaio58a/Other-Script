@@ -1,0 +1,99 @@
+local Workspace = game:GetService("Workspace")
+
+local MAX_ALLOWED_MAGNITUDE = 100000 
+local BATCH_SIZE = 150 
+
+local BLACKLISTED_MESH_IDS = {
+	["12902786354"] = true,
+	["8117754198"] = true,
+	["9056713385"] = true,
+	["106413917745675"] = true,
+	["11817552355"] = true
+}
+
+local function extractId(meshId)
+	if not meshId or meshId == "" then return nil end
+	return string.match(meshId, "%d+") 
+end
+
+local function isAbnormalVector(vec3)
+	if vec3.X ~= vec3.X or vec3.Y ~= vec3.Y or vec3.Z ~= vec3.Z then return true end
+	if vec3.X == math.huge or vec3.Y == math.huge or vec3.Z == math.huge then return true end
+	if vec3.X == -math.huge or vec3.Y == -math.huge or vec3.Z == -math.huge then return true end
+	if vec3.Magnitude > MAX_ALLOWED_MAGNITUDE then return true end
+	return false
+end
+
+local function isMalicious(inst)
+	if inst:IsA("SpecialMesh") or inst:IsA("MeshPart") then
+		local id = extractId(inst.MeshId)
+		if id and BLACKLISTED_MESH_IDS[id] then
+			return true
+		end
+	end
+	
+	if inst:IsA("SpecialMesh") then
+		if isAbnormalVector(inst.Scale) or isAbnormalVector(inst.Offset) or isAbnormalVector(inst.VertexColor) then
+			return true
+		end
+	elseif inst:IsA("MeshPart") then
+		if isAbnormalVector(inst.Size) then
+			return true
+		end
+	end
+	
+	return false
+end
+
+local function neutralize(inst)
+	if inst:GetAttribute("ClientProtected") then return end
+	inst:SetAttribute("ClientProtected", true)
+	
+	if inst:IsA("SpecialMesh") then
+		local parent = inst.Parent
+		if parent and parent:IsA("BasePart") then
+			parent:Destroy() 
+		else
+			inst:Destroy()
+		end
+	elseif inst:IsA("MeshPart") then
+		inst:Destroy()
+	end
+end
+
+local function processInstance(inst)
+	if inst:IsA("SpecialMesh") or inst:IsA("MeshPart") then
+		if isMalicious(inst) then
+			neutralize(inst)
+			return
+		end
+		
+		inst:GetPropertyChangedSignal("MeshId"):Connect(function()
+			if isMalicious(inst) then neutralize(inst) end
+		end)
+		
+		if inst:IsA("SpecialMesh") then
+			inst:GetPropertyChangedSignal("Scale"):Connect(function()
+				if isMalicious(inst) then neutralize(inst) end
+			end)
+		elseif inst:IsA("MeshPart") then
+			inst:GetPropertyChangedSignal("Size"):Connect(function()
+				if isMalicious(inst) then neutralize(inst) end
+			end)
+		end
+	end
+end
+
+task.spawn(function()
+	local descendants = Workspace:GetDescendants()
+	for i, descendant in ipairs(descendants) do
+		processInstance(descendant)
+		if i % BATCH_SIZE == 0 then
+			task.wait()
+		end
+	end
+end)
+
+Workspace.DescendantAdded:Connect(function(descendant)
+	task.defer(processInstance, descendant)
+end)
