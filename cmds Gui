@@ -33,8 +33,60 @@ MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 MainFrame.Active = true
 MainFrame.Parent = ScreenGui
 
--- Smooth Dragging System
+-- Lock & Drag States
+local isLocked = false
 local dragging = false
+local toggleDragging = false
+
+-- ==========================================
+-- Drag System for "cmds" ToggleButton (Controlled by Lock)
+-- ==========================================
+local toggleDragInput, toggleDragStart, toggleStartPos
+local toggleClickStart
+
+local function updateToggleDrag(input)
+    local delta = input.Position - toggleDragStart
+    ToggleButton.Position = UDim2.new(toggleStartPos.X.Scale, toggleStartPos.X.Offset + delta.X, toggleStartPos.Y.Scale, toggleStartPos.Y.Offset + delta.Y)
+end
+
+ToggleButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        toggleClickStart = input.Position
+        if not isLocked then
+            toggleDragging = true
+            toggleDragStart = input.Position
+            toggleStartPos = ToggleButton.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    toggleDragging = false
+                end
+            end)
+        end
+    end
+end)
+
+ToggleButton.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        toggleDragInput = input
+    end
+end)
+
+ToggleButton.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if toggleClickStart then
+            local dist = (input.Position - toggleClickStart).Magnitude
+            if dist < 5 then
+                MainFrame.Visible = not MainFrame.Visible
+            end
+            toggleClickStart = nil
+        end
+    end
+end)
+
+-- ==========================================
+-- Drag System for MainFrame (Always Unlocked/Free)
+-- ==========================================
 local dragInput, dragStart, startPos
 
 local function updateDrag(input)
@@ -62,9 +114,13 @@ MainFrame.InputChanged:Connect(function(input)
     end
 end)
 
+-- Global Drag Input Handler
 UserInputService.InputChanged:Connect(function(input)
     if input == dragInput and dragging then
         updateDrag(input)
+    end
+    if input == toggleDragInput and toggleDragging and not isLocked then
+        updateToggleDrag(input)
     end
 end)
 
@@ -80,6 +136,44 @@ Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 16
 Title.Parent = MainFrame
+
+-- Top Buttons
+local LockButton = Instance.new("TextButton")
+LockButton.Size = UDim2.new(0, 25, 0, 25)
+LockButton.Position = UDim2.new(0, 5, 0, 2)
+LockButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+LockButton.Text = "🔓"
+LockButton.TextSize = 14
+LockButton.Parent = MainFrame
+Instance.new("UICorner", LockButton).CornerRadius = UDim.new(0, 6)
+
+local FolderButton = Instance.new("TextButton")
+FolderButton.Size = UDim2.new(0, 25, 0, 25)
+FolderButton.Position = UDim2.new(1, -30, 0, 2)
+FolderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+FolderButton.Text = "🗂️"
+FolderButton.TextSize = 14
+FolderButton.Parent = MainFrame
+Instance.new("UICorner", FolderButton).CornerRadius = UDim.new(0, 6)
+
+local SaveCommandBtn = Instance.new("TextButton")
+SaveCommandBtn.Size = UDim2.new(0, 25, 0, 25)
+SaveCommandBtn.Position = UDim2.new(1, -58, 0, 2)
+SaveCommandBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SaveCommandBtn.Text = "➕"
+SaveCommandBtn.TextSize = 14
+SaveCommandBtn.Parent = MainFrame
+Instance.new("UICorner", SaveCommandBtn).CornerRadius = UDim.new(0, 6)
+
+LockButton.MouseButton1Click:Connect(function()
+    isLocked = not isLocked
+    if isLocked then
+        LockButton.Text = "🔒"
+        toggleDragging = false
+    else
+        LockButton.Text = "🔓"
+    end
+end)
 
 local IdInput = Instance.new("TextBox")
 IdInput.Size = UDim2.new(0.9, 0, 0, 35)
@@ -106,10 +200,7 @@ RunButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 RunButton.Font = Enum.Font.GothamBold
 RunButton.TextSize = 14
 RunButton.Parent = MainFrame
-
-local UICorner_Run = Instance.new("UICorner")
-UICorner_Run.CornerRadius = UDim.new(0, 6)
-UICorner_Run.Parent = RunButton
+Instance.new("UICorner", RunButton).CornerRadius = UDim.new(0, 6)
 
 local AutoButton = Instance.new("TextButton")
 AutoButton.Size = UDim2.new(0.22, 0, 0, 35)
@@ -120,10 +211,7 @@ AutoButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 AutoButton.Font = Enum.Font.GothamBold
 AutoButton.TextSize = 14
 AutoButton.Parent = MainFrame
-
-local UICorner_Auto = Instance.new("UICorner")
-UICorner_Auto.CornerRadius = UDim.new(0, 6)
-UICorner_Auto.Parent = AutoButton
+Instance.new("UICorner", AutoButton).CornerRadius = UDim.new(0, 6)
 
 local DelayInput = Instance.new("TextBox")
 DelayInput.Size = UDim2.new(0.22, 0, 0, 30)
@@ -136,16 +224,12 @@ DelayInput.Font = Enum.Font.Gotham
 DelayInput.TextSize = 12
 DelayInput.Visible = false
 DelayInput.Parent = MainFrame
+Instance.new("UICorner", DelayInput).CornerRadius = UDim.new(0, 6)
 
-local UICorner_Delay = Instance.new("UICorner")
-UICorner_Delay.CornerRadius = UDim.new(0, 6)
-UICorner_Delay.Parent = DelayInput
-
+-- Bypass / Core Function
 local bypassCounter = 0
-
 local function sendChatMessage(msg)
     if msg == "" then return end
-
     bypassCounter = (bypassCounter % 5) + 1
     local spaces = string.rep(" ", bypassCounter)
     local fullMessage = "/e " .. msg .. spaces
@@ -165,14 +249,236 @@ local function sendChatMessage(msg)
     end)
 end
 
-ToggleButton.MouseButton1Click:Connect(function()
-    MainFrame.Visible = not MainFrame.Visible
+-- Save Popup GUI
+local SavePopup = Instance.new("Frame")
+SavePopup.Size = UDim2.new(0, 220, 0, 110)
+SavePopup.Position = UDim2.new(0.5, -110, 0.5, -55)
+SavePopup.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+SavePopup.Visible = false
+SavePopup.ZIndex = 10
+SavePopup.Parent = MainFrame
+Instance.new("UICorner", SavePopup).CornerRadius = UDim.new(0, 8)
+
+local SaveTitle = Instance.new("TextLabel")
+SaveTitle.Size = UDim2.new(1, 0, 0, 25)
+SaveTitle.BackgroundTransparency = 1
+SaveTitle.Text = "Save cmds"
+SaveTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+SaveTitle.Font = Enum.Font.GothamBold
+SaveTitle.TextSize = 14
+SaveTitle.ZIndex = 11
+SaveTitle.Parent = SavePopup
+
+local SaveNameInput = Instance.new("TextBox")
+SaveNameInput.Size = UDim2.new(0.9, 0, 0, 30)
+SaveNameInput.Position = UDim2.new(0.05, 0, 0, 30)
+SaveNameInput.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SaveNameInput.PlaceholderText = "Text Name"
+SaveNameInput.Text = ""
+SaveNameInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+SaveNameInput.Font = Enum.Font.Gotham
+SaveNameInput.TextSize = 12
+SaveNameInput.ClearTextOnFocus = false
+SaveNameInput.ZIndex = 11
+SaveNameInput.Parent = SavePopup
+Instance.new("UICorner", SaveNameInput).CornerRadius = UDim.new(0, 6)
+
+local CancelSaveBtn = Instance.new("TextButton")
+CancelSaveBtn.Size = UDim2.new(0.4, 0, 0, 30)
+CancelSaveBtn.Position = UDim2.new(0.07, 0, 0, 70)
+CancelSaveBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+CancelSaveBtn.Text = "Cancel"
+CancelSaveBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CancelSaveBtn.Font = Enum.Font.GothamBold
+CancelSaveBtn.TextSize = 12
+CancelSaveBtn.ZIndex = 11
+CancelSaveBtn.Parent = SavePopup
+Instance.new("UICorner", CancelSaveBtn).CornerRadius = UDim.new(0, 6)
+
+local AcceptSaveBtn = Instance.new("TextButton")
+AcceptSaveBtn.Size = UDim2.new(0.4, 0, 0, 30)
+AcceptSaveBtn.Position = UDim2.new(0.53, 0, 0, 70)
+AcceptSaveBtn.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
+AcceptSaveBtn.Text = "Accept"
+AcceptSaveBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+AcceptSaveBtn.Font = Enum.Font.GothamBold
+AcceptSaveBtn.TextSize = 12
+AcceptSaveBtn.ZIndex = 11
+AcceptSaveBtn.Parent = SavePopup
+Instance.new("UICorner", AcceptSaveBtn).CornerRadius = UDim.new(0, 6)
+
+-- Saved Commands List UI (Side Panel)
+local ListFrame = Instance.new("Frame")
+ListFrame.Size = UDim2.new(0, 270, 0, 150)
+ListFrame.Position = UDim2.new(1, 5, 0, 0)
+ListFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+ListFrame.Visible = false
+ListFrame.Parent = MainFrame
+Instance.new("UICorner", ListFrame).CornerRadius = UDim.new(0, 8)
+
+local ListScroll = Instance.new("ScrollingFrame")
+ListScroll.Size = UDim2.new(1, -10, 1, -10)
+ListScroll.Position = UDim2.new(0, 5, 0, 5)
+ListScroll.BackgroundTransparency = 1
+ListScroll.ScrollBarThickness = 4
+ListScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+ListScroll.Parent = ListFrame
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Padding = UDim.new(0, 5)
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Parent = ListScroll
+
+-- Create Saved Item Function
+local function addSavedItem(name, cmdStr)
+    local Item = Instance.new("Frame")
+    Item.Size = UDim2.new(1, -5, 0, 35)
+    Item.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    Item.Parent = ListScroll
+    Instance.new("UICorner", Item).CornerRadius = UDim.new(0, 6)
+
+    local ItemName = Instance.new("TextLabel")
+    ItemName.Size = UDim2.new(0.4, 0, 1, 0)
+    ItemName.Position = UDim2.new(0, 5, 0, 0)
+    ItemName.BackgroundTransparency = 1
+    ItemName.Text = name
+    ItemName.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ItemName.Font = Enum.Font.Gotham
+    ItemName.TextSize = 12
+    ItemName.TextXAlignment = Enum.TextXAlignment.Left
+    ItemName.TextTruncate = Enum.TextTruncate.AtEnd
+    ItemName.Parent = Item
+
+    local ItemRun = Instance.new("TextButton")
+    ItemRun.Size = UDim2.new(0.25, 0, 0.8, 0)
+    ItemRun.Position = UDim2.new(0.42, 0, 0.1, 0)
+    ItemRun.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
+    ItemRun.Text = "Run"
+    ItemRun.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ItemRun.Font = Enum.Font.GothamBold
+    ItemRun.TextSize = 12
+    ItemRun.Parent = Item
+    Instance.new("UICorner", ItemRun).CornerRadius = UDim.new(0, 4)
+
+    local ItemAuto = Instance.new("TextButton")
+    ItemAuto.Size = UDim2.new(0.18, 0, 0.8, 0)
+    ItemAuto.Position = UDim2.new(0.69, 0, 0.1, 0)
+    ItemAuto.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+    ItemAuto.Text = "Off"
+    ItemAuto.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ItemAuto.Font = Enum.Font.GothamBold
+    ItemAuto.TextSize = 12
+    ItemAuto.Parent = Item
+    Instance.new("UICorner", ItemAuto).CornerRadius = UDim.new(0, 4)
+
+    local ItemDelete = Instance.new("TextButton")
+    ItemDelete.Size = UDim2.new(0.08, 0, 0.8, 0)
+    ItemDelete.Position = UDim2.new(0.89, 0, 0.1, 0)
+    ItemDelete.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    ItemDelete.Text = "🗑️"
+    ItemDelete.TextSize = 10
+    ItemDelete.Parent = Item
+    Instance.new("UICorner", ItemDelete).CornerRadius = UDim.new(0, 4)
+
+    -- Item Logic
+    ItemRun.MouseButton1Click:Connect(function()
+        sendChatMessage(cmdStr)
+    end)
+
+    local itemIsAuto = false
+    local itemAutoThread = nil
+    local currentDelay = tonumber(DelayInput.Text) or 1
+
+    local function toggleItemAuto()
+        itemIsAuto = not itemIsAuto
+        if itemIsAuto then
+            ItemAuto.Text = "On"
+            ItemAuto.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
+            
+            currentDelay = tonumber(DelayInput.Text) or 1 
+
+            itemAutoThread = task.spawn(function()
+                while itemIsAuto do
+                    sendChatMessage(cmdStr)
+                    task.wait(currentDelay)
+                end
+            end)
+        else
+            ItemAuto.Text = "Off"
+            ItemAuto.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+            if itemAutoThread then
+                task.cancel(itemAutoThread)
+                itemAutoThread = nil
+            end
+        end
+    end
+
+    local itemIsHolding = false
+    local itemHoldTick = 0
+
+    ItemAuto.MouseButton1Down:Connect(function()
+        itemIsHolding = true
+        itemHoldTick = tick()
+
+        task.spawn(function()
+            task.wait(0.5)
+            if itemIsHolding then
+                DelayInput.Visible = true
+                DelayInput:CaptureFocus()
+            end
+        end)
+    end)
+
+    ItemAuto.MouseButton1Up:Connect(function()
+        if not itemIsHolding then return end
+        itemIsHolding = false
+
+        if tick() - itemHoldTick < 0.5 and not DelayInput.Visible then
+            toggleItemAuto()
+        end
+    end)
+
+    ItemAuto.MouseLeave:Connect(function()
+        itemIsHolding = false
+    end)
+
+    ItemDelete.MouseButton1Click:Connect(function()
+        if itemAutoThread then task.cancel(itemAutoThread) end
+        Item:Destroy()
+        ListScroll.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y + 10)
+    end)
+
+    ListScroll.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y + 45)
+end
+
+-- Button Logic / Connections
+SaveCommandBtn.MouseButton1Click:Connect(function()
+    SavePopup.Visible = not SavePopup.Visible
+end)
+
+CancelSaveBtn.MouseButton1Click:Connect(function()
+    SavePopup.Visible = false
+    SaveNameInput.Text = ""
+end)
+
+AcceptSaveBtn.MouseButton1Click:Connect(function()
+    if SaveNameInput.Text ~= "" and IdInput.Text ~= "" then
+        addSavedItem(SaveNameInput.Text, IdInput.Text)
+        SavePopup.Visible = false
+        SaveNameInput.Text = ""
+        ListFrame.Visible = true
+    end
+end)
+
+FolderButton.MouseButton1Click:Connect(function()
+    ListFrame.Visible = not ListFrame.Visible
 end)
 
 RunButton.MouseButton1Click:Connect(function()
     sendChatMessage(IdInput.Text)
 end)
 
+-- Main Auto Button Logic
 local isAuto = false
 local currentDelay = 1
 local autoThread = nil
