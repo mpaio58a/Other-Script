@@ -46,7 +46,6 @@ MainFrame.InputBegan:Connect(function(input)
         dragging = true
         dragStart = input.Position
         startPos = MainFrame.Position
-
         input.Changed:Connect(function()
             if input.UserInputState == Enum.UserInputState.End then
                 dragging = false
@@ -123,34 +122,37 @@ local UICorner_SelectAll = Instance.new("UICorner")
 UICorner_SelectAll.CornerRadius = UDim.new(0, 6)
 UICorner_SelectAll.Parent = SelectAllButton
 
-local ApplyButton = Instance.new("TextButton")
-ApplyButton.Size = UDim2.new(0.72, 0, 0, 35)
-ApplyButton.Position = UDim2.new(0.05, 0, 0, 125)
-ApplyButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
-ApplyButton.Text = "Apply : OFF"
-ApplyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ApplyButton.Font = Enum.Font.GothamBold
-ApplyButton.TextSize = 14
-ApplyButton.Parent = MainFrame
+-- แถวใหม่: กล่องจำนวน Crash (ซ้าย) และ ปุ่ม Crash Mesh สีเขียว (ขวา)
+local CrashAmountBox = Instance.new("TextBox")
+CrashAmountBox.Size = UDim2.new(0.25, 0, 0, 35)
+CrashAmountBox.Position = UDim2.new(0.05, 0, 0, 125)
+CrashAmountBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+CrashAmountBox.Text = "0"
+CrashAmountBox.PlaceholderText = "Amt"
+CrashAmountBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+CrashAmountBox.Font = Enum.Font.GothamBold
+CrashAmountBox.TextSize = 14
+CrashAmountBox.Parent = MainFrame
 
-local UICorner_Apply = Instance.new("UICorner")
-UICorner_Apply.CornerRadius = UDim.new(0, 6)
-UICorner_Apply.Parent = ApplyButton
+local UICorner_CrashAmt = Instance.new("UICorner")
+UICorner_CrashAmt.CornerRadius = UDim.new(0, 6)
+UICorner_CrashAmt.Parent = CrashAmountBox
 
-local QuestionButton = Instance.new("TextButton")
-QuestionButton.Size = UDim2.new(0.16, 0, 0, 35)
-QuestionButton.Position = UDim2.new(0.79, 0, 0, 125)
-QuestionButton.BackgroundColor3 = Color3.fromRGB(45, 215, 80)
-QuestionButton.Text = "?"
-QuestionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-QuestionButton.Font = Enum.Font.GothamBold
-QuestionButton.TextSize = 24
-QuestionButton.Parent = MainFrame
+local CrashButton = Instance.new("TextButton")
+CrashButton.Size = UDim2.new(0.62, 0, 0, 35)
+CrashButton.Position = UDim2.new(0.33, 0, 0, 125)
+CrashButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69) -- สีเขียว
+CrashButton.Text = "Crash Mesh"
+CrashButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CrashButton.Font = Enum.Font.GothamBold
+CrashButton.TextSize = 14
+CrashButton.Parent = MainFrame
 
-local UICorner_Question = Instance.new("UICorner")
-UICorner_Question.CornerRadius = UDim.new(0, 6)
-UICorner_Question.Parent = QuestionButton
+local UICorner_CrashBtn = Instance.new("UICorner")
+UICorner_CrashBtn.CornerRadius = UDim.new(0, 6)
+UICorner_CrashBtn.Parent = CrashButton
 
+-- แถวเดิม: Copy & Select
 local AmountBox = Instance.new("TextBox")
 AmountBox.Size = UDim2.new(0.25, 0, 0, 35)
 AmountBox.Position = UDim2.new(0.05, 0, 0, 170)
@@ -194,6 +196,7 @@ local UICorner_Unanchor = Instance.new("UICorner")
 UICorner_Unanchor.CornerRadius = UDim.new(0, 6)
 UICorner_Unanchor.Parent = UnanchorButton
 
+-- เมนูรายการ Mesh
 local ListFrame = Instance.new("Frame")
 ListFrame.Size = UDim2.new(0.9, 0, 0, 100)
 ListFrame.Position = UDim2.new(0.05, 0, 0, 270)
@@ -209,6 +212,23 @@ UICorner_List.Parent = ListFrame
 local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Parent = ListFrame
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- เมนูเลือก Batch Size
+local BatchListFrame = Instance.new("Frame")
+BatchListFrame.Size = UDim2.new(0.25, 0, 0, 100)
+BatchListFrame.Position = UDim2.new(0.05, 0, 0, 270)
+BatchListFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+BatchListFrame.Visible = false
+BatchListFrame.ZIndex = 12
+BatchListFrame.Parent = MainFrame
+
+local UICorner_BatchList = Instance.new("UICorner")
+UICorner_BatchList.CornerRadius = UDim.new(0, 6)
+UICorner_BatchList.Parent = BatchListFrame
+
+local UIBatchLayout = Instance.new("UIListLayout")
+UIBatchLayout.Parent = BatchListFrame
+UIBatchLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
 local meshes = {
     {name = "crasher", id = "12902786354"},
@@ -239,17 +259,112 @@ for i, meshData in ipairs(meshes) do
     end)
 end
 
+local copyBatchSize = 1
+local batchOptions = {1, 5, 10, 20, 50}
+
+for i, val in ipairs(batchOptions) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 20)
+    btn.BackgroundColor3 = (i % 2 == 0) and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(55, 55, 55)
+    btn.BorderSizePixel = 0
+    btn.Text = "Batch: " .. val
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 12
+    btn.ZIndex = 13
+    btn.Parent = BatchListFrame
+
+    btn.MouseButton1Click:Connect(function()
+        copyBatchSize = val
+        AmountBox.PlaceholderText = "B: " .. val
+        CrashAmountBox.PlaceholderText = "B: " .. val
+        BatchListFrame.Visible = false
+    end)
+end
+
+-- ระบบกดค้างที่ปุ่ม Crash (เปิดเมนู Mesh ID)
+local isHoldingCrashBtn = false
+local holdTickCrashBtn = 0
+local wasLongPressCrash = false
+
+CrashButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isHoldingCrashBtn = true
+        wasLongPressCrash = false
+        local currentTick = tick()
+        holdTickCrashBtn = currentTick
+        task.delay(0.6, function()
+            if isHoldingCrashBtn and holdTickCrashBtn == currentTick then
+                wasLongPressCrash = true
+                ListFrame.Visible = true
+                BatchListFrame.Visible = false
+            end
+        end)
+    end
+end)
+
+CrashButton.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isHoldingCrashBtn = false
+    end
+end)
+
+-- ระบบกดค้างที่กล่อง CrashAmount (เปิดเมนู Batch Size)
+local isHoldingCrashAmt = false
+local holdTickCrashAmt = 0
+
+CrashAmountBox.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isHoldingCrashAmt = true
+        local currentTick = tick()
+        holdTickCrashAmt = currentTick
+        task.delay(0.6, function()
+            if isHoldingCrashAmt and holdTickCrashAmt == currentTick then
+                BatchListFrame.Visible = true
+                ListFrame.Visible = false
+            end
+        end)
+    end
+end)
+
+CrashAmountBox.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isHoldingCrashAmt = false
+    end
+end)
+
+-- ระบบกดค้างของกล่อง Amount ปกติ
+local isHoldingAmount = false
+local holdTick = 0
+
+AmountBox.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isHoldingAmount = true
+        local currentTick = tick()
+        holdTick = currentTick
+        task.delay(0.6, function()
+            if isHoldingAmount and holdTick == currentTick then
+                BatchListFrame.Visible = true
+                ListFrame.Visible = false
+            end
+        end)
+    end
+end)
+
+AmountBox.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isHoldingAmount = false
+    end
+end)
+
 ToggleButton.MouseButton1Click:Connect(function()
     MainFrame.Visible = not MainFrame.Visible
 end)
 
-QuestionButton.MouseButton1Click:Connect(function()
-    ListFrame.Visible = not ListFrame.Visible
-end)
-
 local isSelecting = false
 local isAllSelected = false
-local isApplying = false
+local isCopying = false
+local isCrashing = false
 local selectedParts = {}
 
 local function updateLabel()
@@ -312,7 +427,6 @@ SelectAllButton.MouseButton1Click:Connect(function()
                     highlight.OutlineColor = Color3.fromRGB(0, 170, 255)
                     highlight.OutlineTransparency = 0
                     highlight.Parent = obj
-
                     selectedParts[obj] = { Highlight = highlight }
                 end
             end
@@ -322,9 +436,7 @@ SelectAllButton.MouseButton1Click:Connect(function()
         SelectAllButton.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
 
         for part, data in pairs(selectedParts) do
-            if data.Highlight then
-                data.Highlight:Destroy()
-            end
+            if data.Highlight then data.Highlight:Destroy() end
         end
         table.clear(selectedParts)
     end
@@ -338,9 +450,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
         local target = mouse.Target
         if target and target:IsA("BasePart") then
             if selectedParts[target] then
-                if selectedParts[target].Highlight then
-                    selectedParts[target].Highlight:Destroy()
-                end
+                if selectedParts[target].Highlight then selectedParts[target].Highlight:Destroy() end
                 selectedParts[target] = nil
             else
                 local highlight = Instance.new("Highlight")
@@ -350,7 +460,6 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
                 highlight.OutlineColor = Color3.fromRGB(0, 170, 255)
                 highlight.OutlineTransparency = 0
                 highlight.Parent = target
-
                 selectedParts[target] = { Highlight = highlight }
             end
             updateLabel()
@@ -358,16 +467,144 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
+-- ระบบ Crash Mesh แบบใหม่
+CrashButton.MouseButton1Click:Connect(function()
+    if wasLongPressCrash then return end -- ป้องกันการทำงานหากผู้ใช้แค่กดค้างเพื่อเลือก Mesh ID
+
+    local btools = getBTools()
+    if not btools then return end
+
+    if isCrashing then
+        isCrashing = false
+        return
+    end
+
+    local partsToModify = {}
+    for part in pairs(selectedParts) do
+        if part and part:IsDescendantOf(workspace) then
+            table.insert(partsToModify, part)
+        end
+    end
+
+    if #partsToModify == 0 then
+        PartNameLabel.Text = "No Part Selected!"
+        task.delay(2, updateLabel)
+        return
+    end
+
+    local targetAmountText = CrashAmountBox.Text
+    local targetAmount = tonumber(targetAmountText) or 0
+
+    isCrashing = true
+    CrashButton.Text = "Cancel"
+    CrashButton.BackgroundColor3 = Color3.fromRGB(220, 50, 50)
+
+    task.spawn(function()
+        local ServerEndpoint = btools.SyncAPI.ServerEndpoint
+
+        -- 1. เปลี่ยน Material เป็น ForceField และเปลี่ยนสีเป็น Cyan
+        local matArgs = {}
+        local colorArgs = {}
+        for _, part in ipairs(partsToModify) do
+            table.insert(matArgs, { Part = part, Material = Enum.Material.ForceField })
+            table.insert(colorArgs, { Part = part, UnionColoring = true, Color = Color3.new(0, 1, 1) })
+        end
+        
+        if isCrashing then
+            ServerEndpoint:InvokeServer("SyncMaterial", matArgs)
+            ServerEndpoint:InvokeServer("SyncColor", colorArgs)
+            task.wait(0.1)
+        end
+
+        -- 2. ใส่ Crash Mesh
+        if isCrashing then
+            local createArgs = {}
+            local syncArgs = {}
+            for _, part in ipairs(partsToModify) do
+                table.insert(createArgs, { Part = part })
+                table.insert(syncArgs, {
+                    Part = part,
+                    MeshType = Enum.MeshType.FileMesh,
+                    MeshId = "rbxassetid://" .. selectedMeshId,
+                    Scale = Vector3.new(1000000, 1000000, 1000000)
+                })
+            end
+            ServerEndpoint:InvokeServer("CreateMeshes", createArgs)
+            ServerEndpoint:InvokeServer("SyncMesh", syncArgs)
+            task.wait(0.15)
+        end
+
+        -- 3. ตรวจสอบว่าจำนวนคัดลอกมากกว่า 0 หรือไม่ หากใช่ ให้เข้าลูปโคลน
+        if isCrashing and targetAmount > 0 then
+            local currentAmount = 0
+            CrashAmountBox.Text = "0/" .. targetAmount
+
+            while currentAmount < targetAmount and isCrashing do
+                local step = math.min(copyBatchSize, targetAmount - currentAmount)
+                local newClones = {}
+
+                local connection = workspace.DescendantAdded:Connect(function(descendant)
+                    if descendant:IsA("BasePart") then
+                        for _, orig in ipairs(partsToModify) do
+                            if descendant.Name == orig.Name and descendant.Size == orig.Size then
+                                table.insert(newClones, descendant)
+                                break
+                            end
+                        end
+                    end
+                end)
+
+                for i = 1, step do
+                    if not isCrashing then break end
+                    ServerEndpoint:InvokeServer("Clone", partsToModify, workspace)
+                end
+
+                task.wait(0.25)
+                connection:Disconnect()
+
+                for _, newPart in ipairs(newClones) do
+                    if not selectedParts[newPart] then
+                        local highlight = Instance.new("Highlight")
+                        highlight.Name = "SelectionOutline"
+                        highlight.Adornee = newPart
+                        highlight.FillTransparency = 1
+                        highlight.OutlineColor = Color3.fromRGB(0, 170, 255)
+                        highlight.OutlineTransparency = 0
+                        highlight.Parent = newPart
+                        selectedParts[newPart] = { Highlight = highlight }
+                    end
+                end
+
+                currentAmount = currentAmount + step
+                CrashAmountBox.Text = currentAmount .. "/" .. targetAmount
+                updateLabel()
+            end
+        end
+
+        -- รีเซ็ตสถานะกลับสู่ปกติเมื่อทำเสร็จ หรือถูกยกเลิก
+        isCrashing = false
+        CrashButton.Text = "Crash Mesh"
+        CrashButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
+        CrashAmountBox.Text = tostring(targetAmount)
+    end)
+end)
+
+-- ระบบ Copy แบบดั้งเดิม
 CopyButton.MouseButton1Click:Connect(function()
+    if isCopying then
+        isCopying = false
+        return
+    end
+
     local btools = getBTools()
     if not btools then return end
 
     local targetAmount = tonumber(AmountBox.Text) or 1
     if targetAmount <= 0 then return end
-    
+
     local ServerEndpoint = btools.SyncAPI.ServerEndpoint
     local originalParts = {}
-    
+
     for part in pairs(selectedParts) do
         if part and part:IsDescendantOf(workspace) then
             table.insert(originalParts, part)
@@ -380,53 +617,59 @@ CopyButton.MouseButton1Click:Connect(function()
         return
     end
 
-    CopyButton.Text = "Copying..."
+    isCopying = true
+    CopyButton.Text = "Cancel"
+    CopyButton.BackgroundColor3 = Color3.fromRGB(220, 50, 50) 
+
+    local currentAmount = 0
     AmountBox.Text = "0/" .. targetAmount
-    
-    for i = 1, targetAmount do
-        local newClones = {}
-        
-        -- ดักจับชิ้นส่วนที่ถูกสร้างขึ้นมาใหม่ในเซิร์ฟเวอร์
-        local connection = workspace.DescendantAdded:Connect(function(descendant)
-            if descendant:IsA("BasePart") then
-                -- ตรวจสอบว่าเป็นพาร์ทที่ถูกโคลนมาจริงๆ (เช็คจากชื่อและขนาด) เพื่อกันไปโดนพาร์ทของคนอื่น
-                for _, orig in ipairs(originalParts) do
-                    if descendant.Name == orig.Name and descendant.Size == orig.Size then
-                        table.insert(newClones, descendant)
-                        break
+
+    task.spawn(function()
+        while currentAmount < targetAmount and isCopying do
+            local step = math.min(copyBatchSize, targetAmount - currentAmount)
+            local newClones = {}
+
+            local connection = workspace.DescendantAdded:Connect(function(descendant)
+                if descendant:IsA("BasePart") then
+                    for _, orig in ipairs(originalParts) do
+                        if descendant.Name == orig.Name and descendant.Size == orig.Size then
+                            table.insert(newClones, descendant)
+                            break
+                        end
                     end
                 end
-            end
-        end)
+            end)
 
-        -- ส่งคำสั่ง Clone
-        ServerEndpoint:InvokeServer("Clone", originalParts, workspace)
-        
-        -- รอเวลาให้เซิร์ฟเวอร์ทำการโคลนและโหลดลง Client ให้เสร็จ (ปรับเวลาได้ถ้าเน็ตช้า)
-        task.wait(0.25)
-        connection:Disconnect() -- ปิดการดักจับ
-        
-        -- นำชิ้นส่วนใหม่มาใส่ Highlight และเพิ่มเข้าไปใน List ที่เลือกไว้
-        for _, newPart in ipairs(newClones) do
-            if not selectedParts[newPart] then
-                local highlight = Instance.new("Highlight")
-                highlight.Name = "SelectionOutline"
-                highlight.Adornee = newPart
-                highlight.FillTransparency = 1
-                highlight.OutlineColor = Color3.fromRGB(0, 170, 255)
-                highlight.OutlineTransparency = 0
-                highlight.Parent = newPart
-
-                selectedParts[newPart] = { Highlight = highlight }
+            for i = 1, step do
+                ServerEndpoint:InvokeServer("Clone", originalParts, workspace)
             end
+
+            task.wait(0.25)
+            connection:Disconnect()
+
+            for _, newPart in ipairs(newClones) do
+                if not selectedParts[newPart] then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Name = "SelectionOutline"
+                    highlight.Adornee = newPart
+                    highlight.FillTransparency = 1
+                    highlight.OutlineColor = Color3.fromRGB(0, 170, 255)
+                    highlight.OutlineTransparency = 0
+                    highlight.Parent = newPart
+                    selectedParts[newPart] = { Highlight = highlight }
+                end
+            end
+
+            currentAmount = currentAmount + step
+            AmountBox.Text = currentAmount .. "/" .. targetAmount
+            updateLabel()
         end
-        
-        AmountBox.Text = i .. "/" .. targetAmount
-    end
-    
-    CopyButton.Text = "Copy & Select"
-    AmountBox.Text = tostring(targetAmount)
-    updateLabel()
+
+        isCopying = false
+        CopyButton.Text = "Copy & Select"
+        CopyButton.BackgroundColor3 = Color3.fromRGB(150, 50, 200)
+        AmountBox.Text = tostring(targetAmount)
+    end)
 end)
 
 UnanchorButton.MouseButton1Click:Connect(function()
@@ -449,61 +692,5 @@ UnanchorButton.MouseButton1Click:Connect(function()
         ServerEndpoint:InvokeServer("SyncAnchor", syncArgs)
         PartNameLabel.Text = "Unanchored " .. #syncArgs .. " parts!"
         task.delay(2, updateLabel)
-    end
-end)
-
-ApplyButton.MouseButton1Click:Connect(function()
-    local btools = getBTools()
-    if not btools then return end
-
-    isApplying = not isApplying
-
-    if isApplying then
-        ApplyButton.Text = "Apply : ON"
-        ApplyButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-
-        local partsToModify = {}
-        for part in pairs(selectedParts) do
-            if part and part:IsDescendantOf(workspace) then
-                table.insert(partsToModify, part)
-            end
-        end
-
-        if #partsToModify == 0 then
-            isApplying = false
-            ApplyButton.Text = "Apply : OFF"
-            ApplyButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
-            PartNameLabel.Text = "No Part Selected!"
-            task.wait(2)
-            updateLabel()
-            return
-        end
-
-        task.spawn(function()
-            local ServerEndpoint = btools.SyncAPI.ServerEndpoint
-
-            while isApplying do
-                local createArgs = {}
-                local syncArgs = {}
-
-                for _, part in ipairs(partsToModify) do
-                    table.insert(createArgs, { Part = part })
-                    table.insert(syncArgs, {
-                        Part = part,
-                        MeshType = Enum.MeshType.FileMesh,
-                        MeshId = "rbxassetid://" .. selectedMeshId,
-                        Scale = Vector3.new(1000000, 1000000, 1000000)
-                    })
-                end
-
-                ServerEndpoint:InvokeServer("CreateMeshes", createArgs)
-                ServerEndpoint:InvokeServer("SyncMesh", syncArgs)
-
-                task.wait(0.15)
-            end
-        end)
-    else
-        ApplyButton.Text = "Apply : OFF"
-        ApplyButton.BackgroundColor3 = Color3.fromRGB(40, 167, 69)
     end
 end)
