@@ -194,6 +194,7 @@ local UICorner_Unanchor = Instance.new("UICorner")
 UICorner_Unanchor.CornerRadius = UDim.new(0, 6)
 UICorner_Unanchor.Parent = UnanchorButton
 
+-- เมนูรายการ Mesh
 local ListFrame = Instance.new("Frame")
 ListFrame.Size = UDim2.new(0.9, 0, 0, 100)
 ListFrame.Position = UDim2.new(0.05, 0, 0, 270)
@@ -209,6 +210,23 @@ UICorner_List.Parent = ListFrame
 local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Parent = ListFrame
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+-- เมนูเลือก Batch (ผลิตทีละกี่ชิ้น)
+local BatchListFrame = Instance.new("Frame")
+BatchListFrame.Size = UDim2.new(0.25, 0, 0, 100)
+BatchListFrame.Position = UDim2.new(0.05, 0, 0, 210)
+BatchListFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+BatchListFrame.Visible = false
+BatchListFrame.ZIndex = 12
+BatchListFrame.Parent = MainFrame
+
+local UICorner_BatchList = Instance.new("UICorner")
+UICorner_BatchList.CornerRadius = UDim.new(0, 6)
+UICorner_BatchList.Parent = BatchListFrame
+
+local UIBatchLayout = Instance.new("UIListLayout")
+UIBatchLayout.Parent = BatchListFrame
+UIBatchLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
 local meshes = {
     {name = "crasher", id = "12902786354"},
@@ -239,17 +257,66 @@ for i, meshData in ipairs(meshes) do
     end)
 end
 
+-- ตัวแปรตั้งค่า Batch Size (เริ่มต้นที่ 1)
+local copyBatchSize = 1
+local batchOptions = {1, 5, 10, 20, 50}
+
+for i, val in ipairs(batchOptions) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 20)
+    btn.BackgroundColor3 = (i % 2 == 0) and Color3.fromRGB(50, 50, 50) or Color3.fromRGB(55, 55, 55)
+    btn.BorderSizePixel = 0
+    btn.Text = "Batch: " .. val
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 12
+    btn.ZIndex = 13
+    btn.Parent = BatchListFrame
+
+    btn.MouseButton1Click:Connect(function()
+        copyBatchSize = val
+        AmountBox.PlaceholderText = "Batch: " .. val
+        BatchListFrame.Visible = false
+    end)
+end
+
+-- ระบบกดค้าง 1 วิที่ AmountBox
+local isHoldingAmount = false
+local holdTick = 0
+
+AmountBox.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isHoldingAmount = true
+        local currentTick = tick()
+        holdTick = currentTick
+        task.delay(1, function()
+            -- ถ้าผ่านไป 1 วิแล้วยังกดค้างอยู่ ให้เปิดหน้าต่างเลือก Batch
+            if isHoldingAmount and holdTick == currentTick then
+                BatchListFrame.Visible = true
+            end
+        end)
+    end
+end)
+
+AmountBox.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isHoldingAmount = false
+    end
+end)
+
 ToggleButton.MouseButton1Click:Connect(function()
     MainFrame.Visible = not MainFrame.Visible
 end)
 
 QuestionButton.MouseButton1Click:Connect(function()
     ListFrame.Visible = not ListFrame.Visible
+    BatchListFrame.Visible = false
 end)
 
 local isSelecting = false
 local isAllSelected = false
 local isApplying = false
+local isCopying = false -- ตัวแปรเช็คสถานะการ Copy
 local selectedParts = {}
 
 local function updateLabel()
@@ -359,6 +426,12 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
 end)
 
 CopyButton.MouseButton1Click:Connect(function()
+    -- ถ้าระบบกำลัง Copy อยู่ และผู้เล่นกดปุ่มนี้ซ้ำ จะทำการ Cancel
+    if isCopying then
+        isCopying = false
+        return
+    end
+
     local btools = getBTools()
     if not btools then return end
 
@@ -380,53 +453,68 @@ CopyButton.MouseButton1Click:Connect(function()
         return
     end
 
-    CopyButton.Text = "Copying..."
+    -- เปิดโหมด Copying เปลี่ยนปุ่มเป็น Cancel สีแดง
+    isCopying = true
+    CopyButton.Text = "Cancel"
+    CopyButton.BackgroundColor3 = Color3.fromRGB(220, 50, 50) 
+    
+    local currentAmount = 0
     AmountBox.Text = "0/" .. targetAmount
 
-    for i = 1, targetAmount do
-        local newClones = {}
+    task.spawn(function()
+        -- ลูปทำงานตราบใดที่เป้าหมายยังไม่ครบ และผู้เล่นยังไม่กด Cancel
+        while currentAmount < targetAmount and isCopying do
+            -- คำนวณว่าจะต้องผลิตกี่ชิ้นในรอบนี้ (ป้องกันการผลิตเกิน target)
+            local step = math.min(copyBatchSize, targetAmount - currentAmount)
+            local newClones = {}
 
-        -- ดักจับชิ้นส่วนที่ถูกสร้างขึ้นมาใหม่ในเซิร์ฟเวอร์
-        local connection = workspace.DescendantAdded:Connect(function(descendant)
-            if descendant:IsA("BasePart") then
-                -- ตรวจสอบว่าเป็นพาร์ทที่ถูกโคลนมาจริงๆ (เช็คจากชื่อและขนาด) เพื่อกันไปโดนพาร์ทของคนอื่น
-                for _, orig in ipairs(originalParts) do
-                    if descendant.Name == orig.Name and descendant.Size == orig.Size then
-                        table.insert(newClones, descendant)
-                        break
+            -- ดักจับชิ้นส่วนที่ถูกสร้างขึ้นมาใหม่
+            local connection = workspace.DescendantAdded:Connect(function(descendant)
+                if descendant:IsA("BasePart") then
+                    for _, orig in ipairs(originalParts) do
+                        if descendant.Name == orig.Name and descendant.Size == orig.Size then
+                            table.insert(newClones, descendant)
+                            break
+                        end
                     end
                 end
+            end)
+
+            -- ส่งคำสั่ง Clone ตามจำนวน step (Batch Size)
+            for i = 1, step do
+                ServerEndpoint:InvokeServer("Clone", originalParts, workspace)
             end
-        end)
 
-        -- ส่งคำสั่ง Clone
-        ServerEndpoint:InvokeServer("Clone", originalParts, workspace)
+            -- รอให้เซิร์ฟเวอร์ตอบสนอง
+            task.wait(0.25)
+            connection:Disconnect()
 
-        -- รอเวลาให้เซิร์ฟเวอร์ทำการโคลนและโหลดลง Client ให้เสร็จ (ปรับเวลาได้ถ้าเน็ตช้า)
-        task.wait(0.25)
-        connection:Disconnect() -- ปิดการดักจับ
+            -- ใส่ Highlight ให้ของที่พึ่งโคลนมา
+            for _, newPart in ipairs(newClones) do
+                if not selectedParts[newPart] then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Name = "SelectionOutline"
+                    highlight.Adornee = newPart
+                    highlight.FillTransparency = 1
+                    highlight.OutlineColor = Color3.fromRGB(0, 170, 255)
+                    highlight.OutlineTransparency = 0
+                    highlight.Parent = newPart
 
-        -- นำชิ้นส่วนใหม่มาใส่ Highlight และเพิ่มเข้าไปใน List ที่เลือกไว้
-        for _, newPart in ipairs(newClones) do
-            if not selectedParts[newPart] then
-                local highlight = Instance.new("Highlight")
-                highlight.Name = "SelectionOutline"
-                highlight.Adornee = newPart
-                highlight.FillTransparency = 1
-                highlight.OutlineColor = Color3.fromRGB(0, 170, 255)
-                highlight.OutlineTransparency = 0
-                highlight.Parent = newPart
-
-                selectedParts[newPart] = { Highlight = highlight }
+                    selectedParts[newPart] = { Highlight = highlight }
+                end
             end
+
+            currentAmount = currentAmount + step
+            AmountBox.Text = currentAmount .. "/" .. targetAmount
         end
 
-        AmountBox.Text = i .. "/" .. targetAmount
-    end
-
-    CopyButton.Text = "Copy & Select"
-    AmountBox.Text = tostring(targetAmount)
-    updateLabel()
+        -- เมื่อเสร็จสิ้น หรือถูก Cancel ให้คืนค่า UI กลับเป็นแบบเดิม
+        isCopying = false
+        CopyButton.Text = "Copy & Select"
+        CopyButton.BackgroundColor3 = Color3.fromRGB(150, 50, 200)
+        AmountBox.Text = tostring(targetAmount)
+        updateLabel()
+    end)
 end)
 
 UnanchorButton.MouseButton1Click:Connect(function()
